@@ -229,10 +229,10 @@ class MatrizDispersa():
                 
         contenido += '\n}'
         #--- se genera DOT y se procede a ecjetuar el comando
-        dot = "matriz_{}_dot.txt".format(nombre)
+        dot = "PDF/matriz_{}_dot.txt".format(nombre)
         with open(dot, 'w') as grafo:
             grafo.write(contenido)
-        result = "matriz_{}.pdf".format(nombre)
+        result = "PDF/matriz_{}.pdf".format(nombre)
         os.system("neato -Tpdf " + dot + " -o " + result)
         #webbrowser.open(result)
 
@@ -344,9 +344,9 @@ class MatrizDispersa():
         grafo += '}'
 
         # ---- luego de crear el contenido del Dot, procedemos a colocarlo en un archivo
-        dot = "matriz_{}_dot.txt".format(nombre)
+        dot = "PDF/matriz_{}_dot.txt".format(nombre)
         with open(dot, 'w') as f:
             f.write(grafo)
-        result = "matriz_{}.pdf".format(nombre)
+        result = "PDF/matriz_{}.pdf".format(nombre)
         os.system("dot -Tpdf " + dot + " -o " + result)
         #webbrowser.open(result)

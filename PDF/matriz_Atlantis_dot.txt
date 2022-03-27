@@ -126,7 +126,7 @@ fontsize="25pt"
 	y19->y20;
 	y19->y20[dir=back];
 	raiz->y1;
-	node[label="*" fillcolor="black" pos="0,-0!" shape=box]i1_1;
+	node[label="UM" fillcolor="red" pos="0,-0!" shape=box]i1_1;
 	node[label="*" fillcolor="black" pos="1,-0!" shape=box]i1_2;
 	node[label="*" fillcolor="black" pos="2,-0!" shape=box]i1_3;
 	node[label="*" fillcolor="black" pos="3,-0!" shape=box]i1_4;
@@ -380,7 +380,7 @@ fontsize="25pt"
 	node[label=" " fillcolor="white" pos="11,-4!" shape=box]i5_12;
 	node[label=" " fillcolor="white" pos="12,-4!" shape=box]i5_13;
 	node[label=" " fillcolor="white" pos="13,-4!" shape=box]i5_14;
-	node[label=" " fillcolor="white" pos="14,-4!" shape=box]i5_15;
+	node[label="UM" fillcolor="red" pos="14,-4!" shape=box]i5_15;
 	node[label=" " fillcolor="white" pos="15,-4!" shape=box]i5_16;
 	node[label="*" fillcolor="black" pos="16,-4!" shape=box]i5_17;
 	node[label="*" fillcolor="black" pos="17,-4!" shape=box]i5_18;
@@ -614,7 +614,7 @@ fontsize="25pt"
 	node[label=" " fillcolor="white" pos="5,-8!" shape=box]i9_6;
 	node[label=" " fillcolor="white" pos="6,-8!" shape=box]i9_7;
 	node[label=" " fillcolor="white" pos="7,-8!" shape=box]i9_8;
-	node[label=" " fillcolor="white" pos="8,-8!" shape=box]i9_9;
+	node[label="UM" fillcolor="red" pos="8,-8!" shape=box]i9_9;
 	node[label=" " fillcolor="white" pos="9,-8!" shape=box]i9_10;
 	node[label="*" fillcolor="black" pos="10,-8!" shape=box]i9_11;
 	node[label="*" fillcolor="black" pos="11,-8!" shape=box]i9_12;
@@ -919,7 +919,7 @@ fontsize="25pt"
 	node[label=" " fillcolor="white" pos="10,-13!" shape=box]i14_11;
 	node[label=" " fillcolor="white" pos="11,-13!" shape=box]i14_12;
 	node[label=" " fillcolor="white" pos="12,-13!" shape=box]i14_13;
-	node[label=" " fillcolor="white" pos="13,-13!" shape=box]i14_14;
+	node[label="UM" fillcolor="red" pos="13,-13!" shape=box]i14_14;
 	node[label=" " fillcolor="white" pos="14,-13!" shape=box]i14_15;
 	node[label=" " fillcolor="white" pos="15,-13!" shape=box]i14_16;
 	node[label=" " fillcolor="white" pos="16,-13!" shape=box]i14_17;
@@ -1092,7 +1092,7 @@ fontsize="25pt"
 	node[label="*" fillcolor="black" pos="3,-16!" shape=box]i17_4;
 	node[label="*" fillcolor="black" pos="4,-16!" shape=box]i17_5;
 	node[label="*" fillcolor="black" pos="5,-16!" shape=box]i17_6;
-	node[label=" " fillcolor="white" pos="6,-16!" shape=box]i17_7;
+	node[label="UM" fillcolor="red" pos="6,-16!" shape=box]i17_7;
 	node[label="*" fillcolor="black" pos="7,-16!" shape=box]i17_8;
 	node[label="*" fillcolor="black" pos="8,-16!" shape=box]i17_9;
 	node[label="*" fillcolor="black" pos="9,-16!" shape=box]i17_10;

@@ -1,47 +1,25 @@
 
+import webbrowser
 import PySimpleGUI as sg
 from ListaMatrizDispersa import ListaMatrizDispersa
-from MatrizDispersa import MatrizDispersa
+from ListaRobots import ListaRobot
 from listaUnidadMilitar import ListaUnidadMilitar
 import xml.etree.ElementTree as ET
-'''
-matriz.insert(10, 10, '*')
-matriz.graficarNeato('PrimerNodo')
-matriz.insert(1, 1, '*')
-matriz.insert(1, 2, '*')
-matriz.insert(1, 3, '*')
-matriz.insert(1, 4, '*')
-matriz.insert(2, 1, '*')
-matriz.insert(2, 2, '*')
-matriz.insert(2, 3, '*')
-matriz.insert(2, 4, '*')
-matriz.insert(3, 1, '*')
-matriz.insert(3, 2, '*')
-matriz.insert(3, 3, '*')
-matriz.insert(3, 4, '*')
-matriz.insert(4, 1, '*')
-matriz.insert(4, 2, '*')
-matriz.insert(4, 3, '*')
-matriz.insert(4, 4, '*')
-matriz.insert(8, 9, '*')
-matriz.insert(9, 8, '*')
-matriz.graficarNeato('Final')
-'''
 
 
 nombre_archivo = []
 lista_matriz = ListaMatrizDispersa()
-
+lista_robots = ListaRobot()
 
 def ObtenerArchivo():
 
-    sg.theme('Black')
+    sg.theme('Purple')
 
-    layout = [[sg.Text('Filename')],
-            [sg.Input(), sg.FileBrowse()],
+    layout = [[sg.Text('Archivo .xml')],
+            [sg.Input(), sg.FileBrowse('Buscar')],
             [sg.Button('Guardar'), sg.Button('Salir')]]
 
-    window = sg.Window('Get filename example', layout)
+    window = sg.Window('Escoje el archivo de entrada .xml', layout)
     event, values = window.read()
     if values[0] == '' or values[0] == None or event == 'Cancel' or event == sg.WIN_CLOSED:
             print('No escogiste ningún archivo .xml')
@@ -49,24 +27,52 @@ def ObtenerArchivo():
     else:
         print('Escogiste el archivo: ',values[0])
         nombre_archivo.append(values[0])
+        elementTree(values[0])
         window.close()
         Interfaz()
         
-    
+
 def Interfaz():
 
     layout = [[sg.Text('Archivo seleccionado')],
             [sg.Text(nombre_archivo[0])],
-            [sg.Button('Mision de rescate de civil')], [sg.Button('Mision de rescate de recursos')]]
+            [sg.Button('Mision de rescate de civil')], [sg.Button('Mision de rescate de recursos')],[sg.Button('Cambiar archivo seleccionado')]]
 
     window = sg.Window('Window Title', layout, enable_close_attempted_event=True)
 
     while True:
         event, values = window.read()
-        print(event, values)
         if (event == 'Mision de rescate de civil'):
-            break
+            ciudad = sg.popup_get_text(lista_matriz.showCiudades(),'Esoge una ciudad' )
+            if lista_matriz.search_item(ciudad) != False:
+                insertaTodo(ciudad) 
+                webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad+'.pdf')
+                robot = sg.popup_get_text(lista_robots.showRobotsRescue(),'Esoge una un robot' )
+                if lista_robots.search_item(robot,'ChapinRescue'):
+                    print('Exito')
+                    pass
+                else:
+                    sg.popup_error('El robot: "' + robot + '" no existe',title = 'Robot no encontrado')
+            else:
+                sg.popup_error('La ciudad: "' + ciudad + '" no existe',title = 'Ciudad no encontrada')
+                
+            
         if (event == 'Mision de rescate de recursos'):
+            ciudad = sg.popup_get_text(lista_matriz.showCiudades(),'Esoge una ciudad' )
+            if lista_matriz.search_item(ciudad) != False:
+                insertaTodo(ciudad) 
+                webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad+'.pdf')
+                robot = sg.popup_get_text(lista_robots.showRobotsFighter(),'Esoge una un robot' )
+                if lista_robots.search_item(robot,'ChapinFighter'):
+                    print('Exito')
+                    pass
+                else:
+                    sg.popup_error('El robot: "' + robot + '" no existe',title = 'Robot no encontrado')
+            else:
+                sg.popup_error('La ciudad: "' + ciudad + '" no existe',title = 'Ciudad no encontrada')
+        if (event == 'Cambiar archivo seleccionado'):
+            window.close()
+            ObtenerArchivo()
             break
         if event == sg.WIN_CLOSE_ATTEMPTED_EVENT:
             break
@@ -74,7 +80,7 @@ def Interfaz():
     window.close()
 def insertaTodo(ciudad):
     matriz = lista_matriz.search_item(ciudad)    
-    with open(ciudad+'.txt') as archivo:
+    with open('Ciudades/'+ciudad+'.txt') as archivo:
         l = 0
         c = 0
         lineas = archivo.readlines()
@@ -112,11 +118,10 @@ def elementTree(ruta):
             for subchild in r: 
                 if subchild.tag == 'ciudad':
                     unidad_militar = ListaUnidadMilitar()
-                    
                     for subsubchild in subchild:
                         if subsubchild.tag == 'nombre':
                             nombre = subsubchild.text
-                            f = open(subsubchild.text +'.txt','w')
+                            f = open('Ciudades/'+subsubchild.text +'.txt','w')
                             print(subsubchild.text)
                         if subsubchild.tag == 'fila':
                             f.write(subsubchild.text + '\n')
@@ -125,13 +130,13 @@ def elementTree(ruta):
                     f.close()
                     lista_matriz.insertLastMatrizDispersa(0,unidad_militar,nombre)
                     unidad_militar.showUnidadesMilitares()
-        
+                if subchild.tag == 'robot':
+                    for subsubchild in subchild:
+                        if subsubchild.tag == 'nombre':
+                            if 'capacidad' in subsubchild.attrib:
+                                lista_robots.insertLastRobot(subsubchild.text,subsubchild.attrib['capacidad'],subsubchild.attrib['tipo'])
+                            else:
+                                lista_robots.insertLastRobot(subsubchild.text,'0',subsubchild.attrib['tipo'])
+                        
 
-
-
-
-
-elementTree('ArchivoPrueba(2).xml')
-#ObtenerArchivo()
-insertaTodo('Atlantis')
-#insertaSeleccion()
+ObtenerArchivo()

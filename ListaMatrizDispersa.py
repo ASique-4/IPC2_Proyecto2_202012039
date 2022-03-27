@@ -18,7 +18,13 @@ class ListaMatrizDispersa():
             self.ultimo.setSiguiente(nuevo_MatrizDispersa)
             self.ultimo = nuevo_MatrizDispersa
 
-
+    def showCiudades(self):
+        tmp = self.primero
+        txt = ''
+        while tmp is not None:
+            txt += ('- ' + tmp.getCiudad() + '\n')
+            tmp = tmp.getSiguiente()
+        return txt
 
     def search_item(self, ciudad):
         if self.primero is None:
