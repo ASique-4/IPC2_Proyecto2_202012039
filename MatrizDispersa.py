@@ -32,6 +32,7 @@ class Nodo_Interno(): # Nodos ortogonales
     def setEntrada(self,entrada):
         self.entrada_mas_cercana = entrada
     
+    
 class MatrizDispersa():
     def __init__(self, capa,ciudad):
         self.capa = capa
@@ -105,6 +106,15 @@ class MatrizDispersa():
             tmp = tmp.siguiente
         return txt
     
+    def limpiarCaminos(self):
+        tmp = self.filas.primero
+        while(tmp is not None):
+            nodoTmp = tmp.acceso
+            while(nodoTmp is not None):
+                if nodoTmp.tipo == 'Visitado' or nodoTmp.tipo == 'Caminando':
+                    nodoTmp.tipo = 'Camino'
+                nodoTmp = nodoTmp.derecha
+            tmp = tmp.siguiente
 
     # (filas = x, columnas = y)
     def insert(self, pos_x, pos_y, caracter):

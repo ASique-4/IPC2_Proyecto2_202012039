@@ -120,21 +120,6 @@ def insertarTodoOrdenado(ciudad):
             c = 0
             matriz.graficarNeatoOrdenar(ciudad,matriz)
 
-def insertarTodoSinImprimir(ciudad):
-    matriz = lista_matriz.search_item(ciudad)    
-    with open('Ciudades/'+ciudad+'.txt') as archivo:
-        l = 0
-        c = 0
-        lineas = archivo.readlines()
-        for linea in lineas:
-            columnas = linea.replace('"','')
-            l += 1
-            for col in columnas:
-                if col != '\n':
-                    c += 1
-                    matriz.insert(l, c, col)
-            c = 0
-
 def elementTree(ruta):
         tree = ET.parse(ruta)
         raiz = tree.getroot()
@@ -183,7 +168,7 @@ def CaminoCorto(ciudad):
             
 
 def recorrerCiudad(nodoFinal,nodoActual,ciudad):
-        insertarTodoSinImprimir(ciudad.getCiudad())
+        ciudad.limpiarCaminos()
         casillas_recorridas = 0
         #anterior = nodoActual
         while nodoFinal.terminal is False:
@@ -198,18 +183,18 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                     nodoActual.derecha.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.derecha
+                
+                elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
+                    casillas_recorridas += 1
+                    nodoActual.abajo.tipo = 'Caminando'
+                    #anterior = nodoActual
+                    nodoActual = nodoActual.abajo
                     
                 elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
                     casillas_recorridas += 1
                     nodoActual.izquierda.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
-                    
-                elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
-                    casillas_recorridas += 1
-                    nodoActual.abajo.tipo = 'Caminando'
-                    #anterior = nodoActual
-                    nodoActual = nodoActual.abajo
 
                 elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
                     casillas_recorridas += 1
@@ -262,6 +247,10 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                         nodoActual.tipo = 'Visitado'
                         #anterior = nodoActual
                         nodoActual = nodoActual.arriba
+                    else:
+                        nodoFinal.terminal = True
+                        casillas_recorridas = 9999
+                        break
             #Nodo actual abajo y a la derecha
             elif nodoActual.coordenadaX >= nodoFinal.coordenadaX and nodoActual.coordenadaY >= nodoFinal.coordenadaY:
 
@@ -328,6 +317,10 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                         casillas_recorridas -= 1
                         nodoActual.tipo = 'Visitado'
                         nodoActual = nodoActual.abajo
+                    else:
+                        nodoFinal.terminal = True
+                        casillas_recorridas = 9999
+                        break
 
             #Nodo actual abajo y a la izquierda
             elif nodoActual.coordenadaX >= nodoFinal.coordenadaX and nodoActual.coordenadaY <= nodoFinal.coordenadaY:
@@ -335,16 +328,16 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                     casillas_recorridas += 1
                     nodoActual.derecha.tipo = 'Caminando'
                     nodoActual = nodoActual.derecha
+                
+                elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
+                    casillas_recorridas += 1
+                    nodoActual.arriba.tipo = 'Caminando'
+                    nodoActual = nodoActual.arriba
 
                 elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
                     casillas_recorridas += 1
                     nodoActual.izquierda.tipo = 'Caminando'
                     nodoActual = nodoActual.izquierda
-
-                elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
-                    casillas_recorridas += 1
-                    nodoActual.arriba.tipo = 'Caminando'
-                    nodoActual = nodoActual.arriba
 
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
                     casillas_recorridas += 1
@@ -393,6 +386,10 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                         casillas_recorridas -= 1
                         nodoActual.tipo = 'Visitado'
                         nodoActual = nodoActual.abajo
+                    else:
+                        nodoFinal.terminal = True
+                        casillas_recorridas = 9999
+                        break
 
             #Nodo actual arriba y a la derecha
             elif nodoActual.coordenadaX <= nodoFinal.coordenadaX and nodoActual.coordenadaY >= nodoFinal.coordenadaY:
@@ -402,15 +399,15 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                     nodoActual.izquierda.tipo = 'Caminando'
                     nodoActual = nodoActual.izquierda
                 
-                elif nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
-                    casillas_recorridas += 1
-                    nodoActual.derecha.tipo = 'Caminando'
-                    nodoActual = nodoActual.derecha
-
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
                     casillas_recorridas += 1
                     nodoActual.abajo.tipo = 'Caminando'
                     nodoActual = nodoActual.abajo
+                
+                elif nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
+                    casillas_recorridas += 1
+                    nodoActual.derecha.tipo = 'Caminando'
+                    nodoActual = nodoActual.derecha
                 
                 elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
                     casillas_recorridas += 1
@@ -459,13 +456,19 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                         casillas_recorridas -= 1
                         nodoActual.tipo = 'Visitado'
                         nodoActual = nodoActual.arriba
+                    else:
+                        nodoFinal.terminal = True
+                        casillas_recorridas = 9999
+                        break
             else:
                 nodoFinal.terminal = True
                 break
         return casillas_recorridas
 
 def recorrerCiudadFinal(nodoFinal,ciudad):
+        ciudad.limpiarCaminos()
         nodoActual = nodoFinal.getEntrada()
+        nodoFinal.terminal = False
         while nodoFinal.terminal is False:
             if nodoActual == nodoFinal :
                 ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
@@ -479,16 +482,16 @@ def recorrerCiudadFinal(nodoFinal,ciudad):
                     nodoActual.derecha.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.derecha
+                
+                elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
+                    nodoActual.abajo.tipo = 'Caminando'
+                    #anterior = nodoActual
+                    nodoActual = nodoActual.abajo
                     
                 elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
                     nodoActual.izquierda.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
-                    
-                elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
-                    nodoActual.abajo.tipo = 'Caminando'
-                    #anterior = nodoActual
-                    nodoActual = nodoActual.abajo
 
                 elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
                     nodoActual.arriba.tipo = 'Caminando'
@@ -602,20 +605,20 @@ def recorrerCiudadFinal(nodoFinal,ciudad):
                     elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Caminando' :
                         nodoActual.tipo = 'Visitado'
                         nodoActual = nodoActual.abajo
-
+    
             #Nodo actual abajo y a la izquierda
             elif nodoActual.coordenadaX >= nodoFinal.coordenadaX and nodoActual.coordenadaY <= nodoFinal.coordenadaY:
                 if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
                     nodoActual.derecha.tipo = 'Caminando'
                     nodoActual = nodoActual.derecha
+                
+                elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
+                    nodoActual.arriba.tipo = 'Caminando'
+                    nodoActual = nodoActual.arriba
 
                 elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
                     nodoActual.izquierda.tipo = 'Caminando'
                     nodoActual = nodoActual.izquierda
-
-                elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
-                    nodoActual.arriba.tipo = 'Caminando'
-                    nodoActual = nodoActual.arriba
 
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
                     nodoActual.abajo.tipo = 'Caminando'
@@ -671,13 +674,13 @@ def recorrerCiudadFinal(nodoFinal,ciudad):
                     nodoActual.izquierda.tipo = 'Caminando'
                     nodoActual = nodoActual.izquierda
                 
-                elif nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
-                    nodoActual.derecha.tipo = 'Caminando'
-                    nodoActual = nodoActual.derecha
-
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
                     nodoActual.abajo.tipo = 'Caminando'
                     nodoActual = nodoActual.abajo
+                
+                elif nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
+                    nodoActual.derecha.tipo = 'Caminando'
+                    nodoActual = nodoActual.derecha
                 
                 elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
                     nodoActual.arriba.tipo = 'Caminando'
