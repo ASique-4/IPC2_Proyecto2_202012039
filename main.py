@@ -156,18 +156,22 @@ def CaminoCorto(ciudad):
             while(nodoTmp is not None):
                 if nodoTmp.tipo == 'Entrada':
                     distancia = recorrerCiudad(nodoFinal,nodoTmp,ciudad)
-                    if int(nodoFinal.getDistancia()) >  int(distancia):
+                    if distancia != 0 and int(nodoFinal.getDistancia()) >  int(distancia):
                         nodoFinal.setDistancia(distancia) 
                         nodoFinal.setEntrada(nodoTmp)
                         nodoFinal.terminal = False
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
-    recorrerCiudadFinal(nodoFinal,ciudad)
-    print('Listo')
-    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+    if nodoFinal != False and nodoFinal.getEntrada() != None:
+        recorrerCiudadFinal(nodoFinal,ciudad)
+        print('Listo')
+        webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+    else:
+        sg.popup_error('No hay forma de llegar al civil :(')
             
 
 def recorrerCiudad(nodoFinal,nodoActual,ciudad):
+        Entrada = nodoActual
         ciudad.limpiarCaminos()
         casillas_recorridas = 0
         #anterior = nodoActual
@@ -223,6 +227,23 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                     nodoFinal.terminal = True
                     break
                 else:
+                    #No ha regresado al inicio
+                    if nodoActual.derecha != False and nodoActual.derecha == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.izquierda != False and nodoActual.izquierda == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.abajo != False and nodoActual.abajo == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.arriba != False and nodoActual.arriba == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
                     #Retroceder
                     if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
                         casillas_recorridas -= 1
@@ -249,7 +270,7 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                         nodoActual = nodoActual.arriba
                     else:
                         nodoFinal.terminal = True
-                        casillas_recorridas = 9999
+                        casillas_recorridas = 10000
                         break
             #Nodo actual abajo y a la derecha
             elif nodoActual.coordenadaX >= nodoFinal.coordenadaX and nodoActual.coordenadaY >= nodoFinal.coordenadaY:
@@ -297,6 +318,23 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                     break
                 
                 else:
+                    #No ha regresado al inicio
+                    if nodoActual.derecha != False and nodoActual.derecha == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.izquierda != False and nodoActual.izquierda == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.abajo != False and nodoActual.abajo == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.arriba != False and nodoActual.arriba == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
                     #Retroceder
                     if nodoActual.arriba != None and nodoActual.arriba.tipo == 'Caminando' :
                         casillas_recorridas -= 1
@@ -319,7 +357,7 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                         nodoActual = nodoActual.abajo
                     else:
                         nodoFinal.terminal = True
-                        casillas_recorridas = 9999
+                        casillas_recorridas = 10000
                         break
 
             #Nodo actual abajo y a la izquierda
@@ -366,6 +404,23 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                     nodoFinal.terminal = True
                     break
                 else:
+                    #No ha regresado al inicio
+                    if nodoActual.derecha != False and nodoActual.derecha == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.izquierda != False and nodoActual.izquierda == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.abajo != False and nodoActual.abajo == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.arriba != False and nodoActual.arriba == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
                     #Retroceder
                     if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
                         casillas_recorridas -= 1
@@ -388,7 +443,7 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                         nodoActual = nodoActual.abajo
                     else:
                         nodoFinal.terminal = True
-                        casillas_recorridas = 9999
+                        casillas_recorridas = 10000
                         break
 
             #Nodo actual arriba y a la derecha
@@ -436,6 +491,23 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                     break
                 
                 else:
+                    #No ha regresado al inicio
+                    if nodoActual.derecha != False and nodoActual.derecha == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.izquierda != False and nodoActual.izquierda == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.abajo != False and nodoActual.abajo == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.arriba != False and nodoActual.arriba == Entrada :
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
                     #Retroceder
                     if nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Caminando' :
                         casillas_recorridas -= 1
@@ -458,9 +530,10 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad):
                         nodoActual = nodoActual.arriba
                     else:
                         nodoFinal.terminal = True
-                        casillas_recorridas = 9999
+                        casillas_recorridas = 10000
                         break
             else:
+                casillas_recorridas = 10000
                 nodoFinal.terminal = True
                 break
         return casillas_recorridas
@@ -731,6 +804,7 @@ def recorrerCiudadFinal(nodoFinal,ciudad):
             else:
                 ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
                 nodoFinal.terminal = True
+
                 webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                 break
 

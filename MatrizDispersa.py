@@ -20,7 +20,7 @@ class Nodo_Interno(): # Nodos ortogonales
         self.derecha = None  # self.siguiente
         self.izquierda = None  # self.anterior
         self.entrada_mas_cercana = None
-        self.distancia = 99999
+        self.distancia = 9999
     
     def getDistancia(self):
         return self.distancia
