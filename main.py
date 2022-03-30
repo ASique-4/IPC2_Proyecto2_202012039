@@ -52,7 +52,7 @@ def Interfaz():
                     robot = sg.popup_get_text(lista_robots.showRobotsRescue(),'Esoge una un robot' )
                     if lista_robots.search_item(robot,'ChapinRescue'):
                         print('Exito')
-                        CaminoCorto()
+                        CaminoCorto(lista_matriz.search_item(ciudad))
                         pass
                     else:
                         sg.popup_error('El robot: "' + robot + '" no existe',title = 'Robot no encontrado')
@@ -165,11 +165,11 @@ def elementTree(ruta):
                             else:
                                 lista_robots.insertLastRobot(subsubchild.text,'0',subsubchild.attrib['tipo'])
 
-def CaminoCorto():
-    ciudad = lista_matriz.search_item(sg.popup_get_text('Ciudad'))
-    nodoFinal = ciudad.getNodo(sg.popup_get_text('Fila'),sg.popup_get_text('Columna'))
-    nodoActual = ciudad.getNodo(sg.popup_get_text('Fila Actual'),sg.popup_get_text('Columna Actual'))
+def CaminoCorto(ciudad):
+    nodoActual = ciudad.getNodo(sg.popup_get_text('Fila de la Entrada \n' + ciudad.showNodoEntrada(),'Fila'),sg.popup_get_text('Columna de la Entrada \n' + ciudad.showNodoEntrada(),'Columna'))
+    nodoFinal = ciudad.getNodo(sg.popup_get_text('Fila del Civil \n' + ciudad.showNodoCivil(),'Fila'),sg.popup_get_text('Columna del Civil \n' + ciudad.showNodoCivil(),'Columna'))
     if nodoFinal != False and nodoActual != False:
+        #anterior = nodoActual
         while nodoFinal.terminal is False:
             if nodoActual == nodoFinal :
                 ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
@@ -178,38 +178,83 @@ def CaminoCorto():
                 break
             #Nodo actual arriba y a la izquierda
             if nodoActual.coordenadaX <= nodoFinal.coordenadaX and nodoActual.coordenadaY <= nodoFinal.coordenadaY:
+                
                 if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
+                    
                     nodoActual.tipo = 'Caminando'
+                    #anterior = nodoActual
                     nodoActual = nodoActual.derecha
                     
                 elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
                     nodoActual.tipo = 'Caminando'
+                    #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
                     
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
                     nodoActual.tipo = 'Caminando'
+                    #anterior = nodoActual
                     nodoActual = nodoActual.abajo
 
                 elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
                     nodoActual.tipo = 'Caminando'
+                    #anterior = nodoActual
                     nodoActual = nodoActual.arriba
+                else:
+                    #Retroceder
+                    if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        #anterior = nodoActual
+                        nodoActual = nodoActual.derecha
+                        
+                    elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        #anterior = nodoActual
+                        nodoActual = nodoActual.izquierda
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        #anterior = nodoActual
+                        nodoActual = nodoActual.abajo
+
+                    elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        #anterior = nodoActual
+                        nodoActual = nodoActual.arriba
             #Nodo actual abajo y a la derecha
             elif nodoActual.coordenadaX >= nodoFinal.coordenadaX and nodoActual.coordenadaY >= nodoFinal.coordenadaY:
-                if nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
+
+                if nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
+                    nodoActual.tipo = 'Caminando'
+                    nodoActual = nodoActual.arriba
+
+                elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
                     nodoActual.tipo = 'Caminando'
                     nodoActual = nodoActual.izquierda
 
                 elif nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
                     nodoActual.tipo = 'Caminando'
                     nodoActual = nodoActual.derecha
-                
-                elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
-                    nodoActual = nodoActual.arriba
 
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
                     nodoActual.tipo = 'Caminando'
                     nodoActual = nodoActual.abajo
+                else:
+                    #Retroceder
+                    if nodoActual.arriba != None and nodoActual.arriba.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.arriba
+
+                    elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.izquierda
+
+                    elif nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.derecha
+
+                    elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.abajo
 
             #Nodo actual abajo y a la izquierda
             elif nodoActual.coordenadaX >= nodoFinal.coordenadaX and nodoActual.coordenadaY <= nodoFinal.coordenadaY:
@@ -228,6 +273,23 @@ def CaminoCorto():
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
                     nodoActual.tipo = 'Caminando'
                     nodoActual = nodoActual.abajo
+                else:
+                    #Retroceder
+                    if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.derecha
+
+                    elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.izquierda
+
+                    elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.arriba
+
+                    elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.abajo
 
             #Nodo actual arriba y a la derecha
             elif nodoActual.coordenadaX <= nodoFinal.coordenadaX and nodoActual.coordenadaY >= nodoFinal.coordenadaY:
@@ -247,11 +309,27 @@ def CaminoCorto():
                 elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
                     nodoActual.tipo = 'Caminando'
                     nodoActual = nodoActual.arriba
-
-                
+                else:
+                    #Retroceder
+                    if nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.izquierda
                     
-                
-                
-            
-        
+                    elif nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.derecha
+
+                    elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.abajo
+                    
+                    elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Caminando' :
+                        nodoActual.tipo = 'Visitado'
+                        nodoActual = nodoActual.arriba
+            else:
+                ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                nodoFinal.terminal = True
+                webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                break
+
 ObtenerArchivo()
