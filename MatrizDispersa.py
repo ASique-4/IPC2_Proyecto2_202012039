@@ -69,6 +69,41 @@ class MatrizDispersa():
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
         return None
+    
+    def showNodoEntrada(self,fila,columna):
+        tmp = self.filas.primero
+        while(tmp is not None):
+            nodoTmp = tmp.acceso
+            while(nodoTmp is not None):
+                if(str(nodoTmp.coordenadaX) == str(fila) and str(nodoTmp.coordenadaY) == str(columna)):
+                    return nodoTmp
+                nodoTmp = nodoTmp.derecha
+            tmp = tmp.siguiente
+        return None
+    
+    def showNodoCivil(self):
+        tmp = self.filas.primero
+        txt = ''
+        while(tmp is not None):
+            nodoTmp = tmp.acceso
+            while(nodoTmp is not None):
+                if(str(nodoTmp.tipo) == 'Civil'):
+                    txt += '-Fila: ' + str(nodoTmp.coordenadaX) + ' -Columna: ' + str(nodoTmp.coordenadaY) + '\n'
+                nodoTmp = nodoTmp.derecha
+            tmp = tmp.siguiente
+        return txt
+    
+    def showNodoEntrada(self):
+        tmp = self.filas.primero
+        txt = ''
+        while(tmp is not None):
+            nodoTmp = tmp.acceso
+            while(nodoTmp is not None):
+                if(str(nodoTmp.tipo) == 'Entrada'):
+                    txt += '-Fila: ' + str(nodoTmp.coordenadaX) + ' -Columna: ' + str(nodoTmp.coordenadaY) + '\n'
+                nodoTmp = nodoTmp.derecha
+            tmp = tmp.siguiente
+        return txt
     # (filas = x, columnas = y)
     def insert(self, pos_x, pos_y, caracter):
         nuevo = Nodo_Interno(pos_x, pos_y, caracter) # se crea nodo interno
@@ -347,7 +382,8 @@ class MatrizDispersa():
                     contenido += '\n\tnode[label="UM" fillcolor="red" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
-                elif pivote_celda.tipo == 'Camino':
+                elif pivote_celda.tipo == 'Camino' or pivote_celda.tipo == 'Visitado':
+                    pivote_celda.tipo = 'Camino'
                     contenido += '\n\tnode[label="CA" fillcolor="white" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                     posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
