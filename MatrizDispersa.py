@@ -19,7 +19,18 @@ class Nodo_Interno(): # Nodos ortogonales
         self.abajo = None
         self.derecha = None  # self.siguiente
         self.izquierda = None  # self.anterior
+        self.entrada_mas_cercana = None
+        self.distancia = 99999
+    
+    def getDistancia(self):
+        return self.distancia
+    def setDistancia(self,distancia):
+        self.distancia = distancia
 
+    def getEntrada(self):
+        return self.entrada_mas_cercana
+    def setEntrada(self,entrada):
+        self.entrada_mas_cercana = entrada
     
 class MatrizDispersa():
     def __init__(self, capa,ciudad):
@@ -69,18 +80,7 @@ class MatrizDispersa():
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
         return None
-    
-    def showNodoEntrada(self,fila,columna):
-        tmp = self.filas.primero
-        while(tmp is not None):
-            nodoTmp = tmp.acceso
-            while(nodoTmp is not None):
-                if(str(nodoTmp.coordenadaX) == str(fila) and str(nodoTmp.coordenadaY) == str(columna)):
-                    return nodoTmp
-                nodoTmp = nodoTmp.derecha
-            tmp = tmp.siguiente
-        return None
-    
+
     def showNodoCivil(self):
         tmp = self.filas.primero
         txt = ''
@@ -104,6 +104,8 @@ class MatrizDispersa():
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
         return txt
+    
+
     # (filas = x, columnas = y)
     def insert(self, pos_x, pos_y, caracter):
         nuevo = Nodo_Interno(pos_x, pos_y, caracter) # se crea nodo interno
