@@ -179,26 +179,50 @@ def CaminoCorto(ciudad):
             #Nodo actual arriba y a la izquierda
             if nodoActual.coordenadaX <= nodoFinal.coordenadaX and nodoActual.coordenadaY <= nodoFinal.coordenadaY:
                 
-                if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
-                    
-                    nodoActual.tipo = 'Caminando'
+                if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino':
+                    nodoActual.derecha.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.derecha
                     
                 elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.izquierda.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
                     
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.abajo.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.abajo
 
                 elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.arriba.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
+                #No ha llegado
+                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
                 else:
                     #Retroceder
                     if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
@@ -224,20 +248,47 @@ def CaminoCorto(ciudad):
             elif nodoActual.coordenadaX >= nodoFinal.coordenadaX and nodoActual.coordenadaY >= nodoFinal.coordenadaY:
 
                 if nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.arriba.tipo = 'Caminando'
                     nodoActual = nodoActual.arriba
 
                 elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.izquierda.tipo = 'Caminando'
                     nodoActual = nodoActual.izquierda
 
                 elif nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.derecha.tipo = 'Caminando'
                     nodoActual = nodoActual.derecha
 
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.abajo.tipo = 'Caminando'
                     nodoActual = nodoActual.abajo
+                #No ha llegado
+                
+                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                
                 else:
                     #Retroceder
                     if nodoActual.arriba != None and nodoActual.arriba.tipo == 'Caminando' :
@@ -259,20 +310,46 @@ def CaminoCorto(ciudad):
             #Nodo actual abajo y a la izquierda
             elif nodoActual.coordenadaX >= nodoFinal.coordenadaX and nodoActual.coordenadaY <= nodoFinal.coordenadaY:
                 if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.derecha.tipo = 'Caminando'
                     nodoActual = nodoActual.derecha
 
                 elif nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.izquierda.tipo = 'Caminando'
                     nodoActual = nodoActual.izquierda
 
                 elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.arriba.tipo = 'Caminando'
                     nodoActual = nodoActual.arriba
 
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.abajo.tipo = 'Caminando'
                     nodoActual = nodoActual.abajo
+                #No ha llegado
+                
+                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
                 else:
                     #Retroceder
                     if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
@@ -295,20 +372,46 @@ def CaminoCorto(ciudad):
             elif nodoActual.coordenadaX <= nodoFinal.coordenadaX and nodoActual.coordenadaY >= nodoFinal.coordenadaY:
                 
                 if nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.izquierda.tipo = 'Caminando'
                     nodoActual = nodoActual.izquierda
                 
                 elif nodoActual.derecha != None and nodoActual.derecha.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.derecha.tipo = 'Caminando'
                     nodoActual = nodoActual.derecha
 
                 elif nodoActual.abajo != None and nodoActual.abajo.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.abajo.tipo = 'Caminando'
                     nodoActual = nodoActual.abajo
                 
                 elif nodoActual.arriba != None and nodoActual.arriba.tipo == 'Camino' :
-                    nodoActual.tipo = 'Caminando'
+                    nodoActual.arriba.tipo = 'Caminando'
                     nodoActual = nodoActual.arriba
+                #No ha llegado
+                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                    nodoActual.tipo = 'Caminando'
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    nodoFinal.terminal = True
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    break
+                
                 else:
                     #Retroceder
                     if nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Caminando' :
