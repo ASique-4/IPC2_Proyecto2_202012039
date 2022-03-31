@@ -18,7 +18,7 @@
         </ciudad>
         <ciudad>
             <nombre filas="20" columnas="20">Atlantis</nombre>
-            <fila numero="1">" ***********E*******"</fila>
+            <fila numero="1">"************E*******"</fila>
             <fila numero="2">"**        ** **  R**"</fila>
             <fila numero="3">"** ****** ** ** ****"</fila>
             <fila numero="4">"**   **** ** ** ****"</fila>
@@ -38,7 +38,7 @@
             <fila numero="18">"** ******* ****** **"</fila>
             <fila numero="19">"**         ******C**"</fila>
             <fila numero="20">"******E*************"</fila>
-            <unidadMilitar fila="1" columna="1">35</unidadMilitar>
+            <unidadMilitar fila="7" columna="3">100</unidadMilitar>
             <unidadMilitar fila="5" columna="15">40</unidadMilitar>
             <unidadMilitar fila="9" columna="9">15</unidadMilitar>
             <unidadMilitar fila="14" columna="14">50</unidadMilitar>
@@ -56,6 +56,7 @@
             <fila numero="8">"* *** **      *"</fila>
             <fila numero="9">"E ***R** ******"</fila>
             <fila numero="10">"********C******"</fila>
+            <unidadMilitar fila="3" columna="9">75</unidadMilitar>
             <unidadMilitar fila="3" columna="9">75</unidadMilitar>
             <unidadMilitar fila="7" columna="3">15</unidadMilitar>
             <unidadMilitar fila="8" columna="13">60</unidadMilitar>

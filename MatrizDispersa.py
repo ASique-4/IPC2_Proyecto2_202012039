@@ -94,6 +94,18 @@ class MatrizDispersa():
             tmp = tmp.siguiente
         return txt
     
+    def showNodoRecurso(self):
+        tmp = self.filas.primero
+        txt = ''
+        while(tmp is not None):
+            nodoTmp = tmp.acceso
+            while(nodoTmp is not None):
+                if(str(nodoTmp.tipo) == 'Recurso'):
+                    txt += '-Fila: ' + str(nodoTmp.coordenadaX) + ' -Columna: ' + str(nodoTmp.coordenadaY) + '\n'
+                nodoTmp = nodoTmp.derecha
+            tmp = tmp.siguiente
+        return txt
+    
     def showNodoEntrada(self):
         tmp = self.filas.primero
         txt = ''
@@ -113,8 +125,11 @@ class MatrizDispersa():
             while(nodoTmp is not None):
                 if nodoTmp.tipo == 'Visitado' or nodoTmp.tipo == 'Caminando':
                     nodoTmp.tipo = 'Camino'
+                if nodoTmp.tipo == 'Vencido':
+                    nodoTmp.tipo = 'UnidadMilitar'
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
+
 
     # (filas = x, columnas = y)
     def insert(self, pos_x, pos_y, caracter):
@@ -269,7 +284,7 @@ class MatrizDispersa():
                     contenido += '\n\tnode[label="R" fillcolor="gray" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
-                elif matriz.getUnidadesMilitares().search_item(pivote_celda.coordenadaY,pivote_celda.coordenadaX) != False:
+                elif matriz.getUnidadesMilitares().search_item(pivote_celda.coordenadaX,pivote_celda.coordenadaY) != False:
                     pivote_celda.tipo = 'UnidadMilitar'
                     contenido += '\n\tnode[label="UM" fillcolor="red" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
@@ -390,10 +405,15 @@ class MatrizDispersa():
                     contenido += '\n\tnode[label="R" fillcolor="gray" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
-                elif matriz.getUnidadesMilitares().search_item(pivote_celda.coordenadaY,pivote_celda.coordenadaX) != False:
+                elif matriz.getUnidadesMilitares().search_item(pivote_celda.coordenadaX,pivote_celda.coordenadaY) != False:
                     contenido += '\n\tnode[label="UM" fillcolor="red" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
+                elif pivote_celda.tipo == 'Vencido':
+                    contenido += '\n\tnode[label="UM" fillcolor="cian" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                        posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
+                    )
+                
                 elif pivote_celda.tipo == 'Camino' or pivote_celda.tipo == 'Visitado':
                     pivote_celda.tipo = 'Camino'
                     contenido += '\n\tnode[label="CA" fillcolor="white" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"

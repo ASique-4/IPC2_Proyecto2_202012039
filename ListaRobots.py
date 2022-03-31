@@ -31,7 +31,7 @@ class ListaRobot():
         txt = ''
         while tmp is not None:
             if tmp.getTipo() == 'ChapinFighter':
-                txt += ('- Nombre: ' + tmp.getNombre() +'- Capacidad: ' + tmp.getFuerza() +'\n')
+                txt += ('- Nombre: ' + tmp.getNombre() +'- Capacidad: ' + str(tmp.getFuerza()) +'\n')
             tmp = tmp.getSiguiente()
         return txt
 
