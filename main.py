@@ -1369,5 +1369,7 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
 
                 webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                 break
-        
+        nodoFinal.entrada_mas_cercana = None
+        nodoFinal.distancia = 9999
+
 ObtenerArchivo()
