@@ -264,29 +264,29 @@ class MatrizDispersa():
                     pivotey = pivotey.siguiente
                 if pivote_celda.caracter == '*':
                     pivote_celda.tipo = 'NoPasar'
-                    contenido += '\n\tnode[label="*" fillcolor="black" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="black" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif pivote_celda.caracter == 'E':
                     pivote_celda.tipo = 'Entrada'
-                    contenido += '\n\tnode[label="E" fillcolor="green" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="green" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif pivote_celda.caracter == 'C':
                     pivote_celda.tipo = 'Civil'
                     matriz.setCiviles(int(matriz.getCiviles()) + 1)
-                    contenido += '\n\tnode[label="C" fillcolor="blue" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="blue" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif pivote_celda.caracter == 'R':
                     pivote_celda.tipo = 'Recurso'
                     matriz.setRecursos(int(matriz.getRecursos()) + 1)
-                    contenido += '\n\tnode[label="R" fillcolor="gray" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="gray" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif matriz.getUnidadesMilitares().search_item(pivote_celda.coordenadaX,pivote_celda.coordenadaY) != False:
                     pivote_celda.tipo = 'UnidadMilitar'
-                    contenido += '\n\tnode[label="UM" fillcolor="red" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="red" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 else:
@@ -386,37 +386,36 @@ class MatrizDispersa():
                     posy_celda += 1
                     pivotey = pivotey.siguiente
                 if pivote_celda.tipo == 'NoPasar':
-                    contenido += '\n\tnode[label="*" fillcolor="black" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="black" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif pivote_celda.tipo == 'Civil':
-                    contenido += '\n\tnode[label="C" fillcolor="blue" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="blue" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif pivote_celda.tipo == 'Entrada':
-                    contenido += '\n\tnode[label="E" fillcolor="green" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="green" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif pivote_celda.tipo == 'Caminando':
-                    contenido += '\n\tnode[label="CM" fillcolor="purple" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="purple" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif pivote_celda.tipo == 'Recurso':
-                    contenido += '\n\tnode[label="R" fillcolor="gray" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
-                        posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
-                    )
-                elif matriz.getUnidadesMilitares().search_item(pivote_celda.coordenadaX,pivote_celda.coordenadaY) != False:
-                    contenido += '\n\tnode[label="UM" fillcolor="red" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="gray" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif pivote_celda.tipo == 'Vencido':
-                    contenido += '\n\tnode[label="UM" fillcolor="cian" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="yellow" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
-                
+                elif matriz.getUnidadesMilitares().search_item(pivote_celda.coordenadaX,pivote_celda.coordenadaY) != False:
+                    contenido += '\n\tnode[label="" fillcolor="red" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                        posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
+                    )
                 elif pivote_celda.tipo == 'Camino' or pivote_celda.tipo == 'Visitado':
                     pivote_celda.tipo = 'Camino'
-                    contenido += '\n\tnode[label="CA" fillcolor="white" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                    contenido += '\n\tnode[label="" fillcolor="white" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                     posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 
