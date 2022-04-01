@@ -125,8 +125,12 @@ class MatrizDispersa():
             while(nodoTmp is not None):
                 if nodoTmp.tipo == 'Visitado' or nodoTmp.tipo == 'Caminando':
                     nodoTmp.tipo = 'Camino'
-                if nodoTmp.tipo == 'Vencido':
+                elif nodoTmp.tipo == 'Vencido':
                     nodoTmp.tipo = 'UnidadMilitar'
+                elif nodoTmp.tipo == 'CaminandoEntrada' or nodoTmp.tipo == 'VisitadoEntrada':
+                    nodoTmp.tipo = 'Entrada'
+                elif nodoTmp.tipo == 'CaminandoCivil' or nodoTmp.tipo == 'VisitadoCivil':
+                    nodoTmp.tipo = 'Civil'
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
 

@@ -38,7 +38,6 @@
             <fila numero="18">"** ************** **"</fila>
             <fila numero="19">"**         ******C**"</fila>
             <fila numero="20">"******E*************"</fila>
-            <unidadMilitar fila="7" columna="3">100</unidadMilitar>
             <unidadMilitar fila="5" columna="15">40</unidadMilitar>
             <unidadMilitar fila="9" columna="9">15</unidadMilitar>
             <unidadMilitar fila="14" columna="14">50</unidadMilitar>
