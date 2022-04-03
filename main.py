@@ -47,7 +47,7 @@ def Interfaz():
                 insertaTodo(ciudad) 
                 if lista_matriz.search_item(ciudad).getCiviles() > 0:
                     
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad+'.pdf')
+                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.replace(" ","")+'.pdf')
                     robot = sg.popup_get_text(lista_robots.showRobotsRescue(),'Esoge una un robot' )
                     if lista_robots.search_item(robot,'ChapinRescue'):
                         print('Exito')
@@ -86,7 +86,7 @@ def Interfaz():
 
 def insertaTodo(ciudad):
     matriz = lista_matriz.search_item(ciudad)    
-    with open('Ciudades/'+ciudad+'.txt') as archivo:
+    with open('Ciudades/'+ciudad.replace(" ","")+'.txt') as archivo:
         l = 0
         c = 0
         lineas = archivo.readlines()
@@ -98,11 +98,11 @@ def insertaTodo(ciudad):
                     c += 1
                     matriz.insert(l, c, col)
             c = 0
-            matriz.graficarNeato(ciudad,matriz)
+            matriz.graficarNeato(ciudad.replace(" ",""),matriz)
 
 def insertarTodoOrdenado(ciudad):
     matriz = lista_matriz.search_item(ciudad)    
-    with open('Ciudades/'+ciudad+'.txt') as archivo:
+    with open('Ciudades/'+ciudad.replace(" ","")+'.txt') as archivo:
         l = 0
         c = 0
         lineas = archivo.readlines()
@@ -114,7 +114,7 @@ def insertarTodoOrdenado(ciudad):
                     c += 1
                     matriz.insert(l, c, col)
             c = 0
-            matriz.graficarNeatoOrdenar(ciudad,matriz)
+            matriz.graficarNeatoOrdenar(ciudad.replace(" ",""),matriz)
 
 def elementTree(ruta):
         tree = ET.parse(ruta)
@@ -126,7 +126,7 @@ def elementTree(ruta):
                     for subsubchild in subchild:
                         if subsubchild.tag == 'nombre':
                             nombre = subsubchild.text
-                            f = open('Ciudades/'+subsubchild.text +'.txt','w')
+                            f = open('Ciudades/'+subsubchild.text.replace(" ","") +'.txt','w')
                             print(subsubchild.text)
                         if subsubchild.tag == 'fila':
                             f.write(subsubchild.text + '\n')
@@ -163,7 +163,7 @@ def CaminoCortoParaCivil(ciudad,robot):
     if nodoFinal != False and nodoFinal.getEntrada() != None:
         recorrerCiudadFinal(nodoFinal,ciudad,robot)
         print('Listo')
-        webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+        webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+str(ciudad.getCiudad()).replace(" ","")+'.pdf')
     else:
         sg.popup_error('No hay forma de llegar al civil :(')
             
@@ -187,7 +187,7 @@ def CaminoCortoParaRecurso(ciudad,robot):
     if nodoFinal != False and nodoFinal.getEntrada() != None:
         recorrerCiudadFinal(nodoFinal,ciudad,robot)
         print('Listo')
-        webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+        webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+str(ciudad.getCiudad()).replace(" ","")+'.pdf')
     else:
         sg.popup_error('No hay forma de llegar al Recurso :(')
 
@@ -201,9 +201,7 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
         casillas_recorridas = 0
         #anterior = nodoActual
         while nodoFinal.terminal is False:
-            if nodoActual == nodoFinal :
-                nodoFinal.terminal = True
-                break
+
             #Nodo actual arriba y a la izquierda
             if nodoActual.coordenadaX <= nodoFinal.coordenadaX and nodoActual.coordenadaY <= nodoFinal.coordenadaY:
 
@@ -217,7 +215,17 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                         nodoActual.derecha.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.derecha
-                
+                elif nodoActual.arriba != None and (nodoActual.arriba.tipo == 'Camino' or nodoActual.arriba.tipo == 'Entrada' or nodoActual.arriba.tipo == 'Civil') and nodoActual.arriba != nodoFinal and nodoActual.arriba != Entrada and nodoActual.coordenadaX >= nodoFinal.coordenadaX:
+                    casillas_recorridas += 1
+                    if nodoActual.arriba.tipo == 'Entrada':
+                        nodoActual.arriba.tipo = 'CaminandoEntrada'
+                    elif nodoActual.arriba.tipo == 'Civil':
+                        nodoActual.arriba.tipo = 'CaminandoCivil'
+                    else:
+                        nodoActual.arriba.tipo = 'Caminando'
+                    #anterior = nodoActual
+                    nodoActual = nodoActual.arriba
+                    
                 elif nodoActual.abajo != None and (nodoActual.abajo.tipo == 'Camino' or nodoActual.abajo.tipo == 'Entrada' or nodoActual.abajo.tipo == 'Civil') and nodoActual.abajo!= nodoFinal and nodoActual.abajo!= Entrada and nodoActual.coordenadaX >= nodoFinal.coordenadaX:
                     casillas_recorridas += 1
                     if nodoActual.abajo.tipo == 'Entrada':
@@ -240,16 +248,7 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
 
-                elif nodoActual.arriba != None and (nodoActual.arriba.tipo == 'Camino' or nodoActual.arriba.tipo == 'Entrada' or nodoActual.arriba.tipo == 'Civil') and nodoActual.arriba != nodoFinal and nodoActual.arriba != Entrada and nodoActual.coordenadaX >= nodoFinal.coordenadaX:
-                    casillas_recorridas += 1
-                    if nodoActual.arriba.tipo == 'Entrada':
-                        nodoActual.arriba.tipo = 'CaminandoEntrada'
-                    elif nodoActual.arriba.tipo == 'Civil':
-                        nodoActual.arriba.tipo = 'CaminandoCivil'
-                    else:
-                        nodoActual.arriba.tipo = 'Caminando'
-                    #anterior = nodoActual
-                    nodoActual = nodoActual.arriba
+                
 
                 elif nodoActual.abajo != None and (nodoActual.abajo.tipo == 'Camino' or nodoActual.abajo.tipo == 'Entrada' or nodoActual.abajo.tipo == 'Civil') and nodoActual.abajo!= nodoFinal and nodoActual.abajo!= Entrada and nodoActual.coordenadaX < nodoFinal.coordenadaX:
                     casillas_recorridas += 1
@@ -339,48 +338,99 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
                     lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
-                    nodoActual.izquierda.tipo = 'Vencido'
+                    nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
                 #No ha llegado
-                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
                 else:
                     #No ha regresado al inicio
-                    if nodoActual.derecha != False and nodoActual.derecha == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.izquierda != False and nodoActual.izquierda == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.abajo != False and nodoActual.abajo == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.arriba != False and nodoActual.arriba == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
+                    if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.derecha.derecha.tipo == 'Entrada':
+                                nodoActual.derecha.derecha.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.derecha.derecha.tipo == 'Civil':
+                                nodoActual.derecha.derecha.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.derecha.derecha.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                    elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                        if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            else:
+                                nodoActual.izquierda.tipo = 'Caminando'
+                                nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                        if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.abajo.abajo
+                            elif nodoActual.abajo.abajo.tipo == 'Civil':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.abajo.abajo
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.abajo.abajo
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                        if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.arriba.arriba.tipo == 'Entrada':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.arriba.arriba
+                            elif nodoActual.arriba.arriba.tipo == 'Civil':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.arriba.arriba
+                            else:
+                                nodoActual.arriba.tipo = 'Caminando'
+                                nodoActual = nodoActual.arriba.arriba
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
                     #Retroceder
                     if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
                         casillas_recorridas -= 1
@@ -512,22 +562,22 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                     nodoActual = nodoActual.abajo
 
                 #No ha llegado
-                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
@@ -541,7 +591,7 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
                     lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
-                    nodoActual.izquierda.tipo = 'Vencido'
+                    nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
                 
@@ -584,22 +634,78 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
 
                 else:
                     #No ha regresado al inicio
-                    if nodoActual.derecha != False and nodoActual.derecha == Entrada :
+                    if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.abajo.tipo == 'Civil':
+                                nodoActual.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
                         casillas_recorridas = 10000
                         nodoFinal.terminal = True
                         break
-                    elif nodoActual.izquierda != False and nodoActual.izquierda == Entrada :
+                    elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                        if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            else:
+                                nodoActual.izquierda.tipo = 'Caminando'
+                                nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                        if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.abajo.abajo
+                            elif nodoActual.abajo.abajo.tipo == 'Civil':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.abajo.abajo
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.abajo.abajo
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
                         casillas_recorridas = 10000
                         nodoFinal.terminal = True
                         break
-                    elif nodoActual.abajo != False and nodoActual.abajo == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.arriba != False and nodoActual.arriba == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
+                    elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                        if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.arriba.arriba.tipo == 'Entrada':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.arriba.arriba
+                            elif nodoActual.arriba.arriba.tipo == 'Civil':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.arriba.arriba
+                            else:
+                                nodoActual.arriba.tipo = 'Caminando'
+                                nodoActual = nodoActual.arriba.arriba
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
                     #Retroceder
                     if nodoActual.arriba != None and nodoActual.arriba.tipo == 'Caminando' :
                         casillas_recorridas -= 1
@@ -728,22 +834,22 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
 
                 #No ha llegado
                 
-                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
@@ -770,7 +876,7 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
                     lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
-                    nodoActual.izquierda.tipo = 'Vencido'
+                    nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
                 
@@ -799,22 +905,73 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                     nodoActual = nodoActual.abajo
                 else:
                     #No ha regresado al inicio
-                    if nodoActual.derecha != False and nodoActual.derecha == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.izquierda != False and nodoActual.izquierda == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.abajo != False and nodoActual.abajo == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.arriba != False and nodoActual.arriba == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
+                    if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.abajo.tipo == 'Civil':
+                                nodoActual.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
+                    elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                        if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            else:
+                                nodoActual.izquierda.tipo = 'Caminando'
+                                nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                        if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.abajo.abajo
+                            elif nodoActual.abajo.abajo.tipo == 'Civil':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.abajo.abajo
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.abajo.abajo
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                    elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                        if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.arriba.arriba.tipo == 'Entrada':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.arriba.arriba
+                            elif nodoActual.arriba.arriba.tipo == 'Civil':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.arriba.arriba
+                            else:
+                                nodoActual.arriba.tipo = 'Caminando'
+                                nodoActual = nodoActual.arriba.arriba
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
                     #Retroceder
                     if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
                         casillas_recorridas -= 1
@@ -942,22 +1099,22 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                     nodoActual = nodoActual.arriba
 
                 #No ha llegado
-                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
                     break
-                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     casillas_recorridas += 1
                     nodoActual.tipo = 'Caminando'
                     nodoFinal.terminal = True
@@ -1006,29 +1163,81 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
                     lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
-                    nodoActual.izquierda.tipo = 'Vencido'
+                    nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
                 
                 
                 else:
                     #No ha regresado al inicio
-                    if nodoActual.derecha != False and nodoActual.derecha == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.izquierda != False and nodoActual.izquierda == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.abajo != False and nodoActual.abajo == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
-                    elif nodoActual.arriba != False and nodoActual.arriba == Entrada :
-                        casillas_recorridas = 10000
-                        nodoFinal.terminal = True
-                        break
+                    if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.abajo.tipo == 'Civil':
+                                nodoActual.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
+                    elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                        if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            else:
+                                nodoActual.izquierda.tipo = 'Caminando'
+                                nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                        if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.abajo.abajo
+                            elif nodoActual.abajo.abajo.tipo == 'Civil':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.abajo.abajo
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.abajo.abajo
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
+                    elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                        if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.arriba.arriba.tipo == 'Entrada':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.arriba.arriba
+                            elif nodoActual.arriba.arriba.tipo == 'Civil':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.arriba.arriba
+                            else:
+                                nodoActual.arriba.tipo = 'Caminando'
+                                nodoActual = nodoActual.arriba.arriba
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
                     #Retroceder
                     if nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Caminando' :
                         casillas_recorridas -= 1
@@ -1075,9 +1284,74 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                         break
             
             else:
-                casillas_recorridas = 10000
-                nodoFinal.terminal = True
-                break
+                    if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.abajo.tipo == 'Civil':
+                                nodoActual.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
+                    elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                        if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            else:
+                                nodoActual.izquierda.tipo = 'Caminando'
+                                nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                        if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.abajo.abajo
+                            elif nodoActual.abajo.abajo.tipo == 'Civil':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.abajo.abajo
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.abajo.abajo
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
+                    elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                        if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.arriba.arriba.tipo == 'Entrada':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.arriba.arriba
+                            elif nodoActual.arriba.arriba.tipo == 'Civil':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.arriba.arriba
+                            else:
+                                nodoActual.arriba.tipo = 'Caminando'
+                                nodoActual = nodoActual.arriba.arriba
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
         if lista_robots.search_item(robot,'ChapinFighter') != False :
             lista_robots.search_item(robot,'ChapinFighter').setFuerza(fuerza_tmp )
         ciudad.limpiarCaminos()
@@ -1091,11 +1365,7 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
         nodoFinal.terminal = False
         casillas_recorridas = 0
         while nodoFinal.terminal is False:
-            if nodoActual == nodoFinal :
-                ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
-                nodoFinal.terminal = True
-                webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
-                break
+
             #Nodo actual arriba y a la izquierda
             if nodoActual.coordenadaX <= nodoFinal.coordenadaX and nodoActual.coordenadaY <= nodoFinal.coordenadaY:
                 
@@ -1108,7 +1378,15 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                         nodoActual.derecha.tipo = 'Caminando'
                     #anterior = nodoActual
                     nodoActual = nodoActual.derecha
-                
+                elif nodoActual.arriba != None and (nodoActual.arriba.tipo == 'Camino' or nodoActual.arriba.tipo == 'Entrada' or nodoActual.arriba.tipo == 'Civil') and nodoActual.arriba != nodoFinal and nodoActual.arriba != Entrada and nodoActual.coordenadaX >= nodoFinal.coordenadaX :
+                    if nodoActual.arriba.tipo == 'Entrada':
+                        nodoActual.arriba.tipo = 'CaminandoEntrada'
+                    elif nodoActual.arriba.tipo == 'Civil':
+                        nodoActual.arriba.tipo = 'CaminandoCivil'
+                    else:
+                        nodoActual.arriba.tipo = 'Caminando'
+                    #anterior = nodoActual
+                    nodoActual = nodoActual.arriba
                 elif nodoActual.abajo != None and (nodoActual.abajo.tipo == 'Camino' or nodoActual.abajo.tipo == 'Entrada' or nodoActual.abajo.tipo == 'Civil') and nodoActual.abajo!= nodoFinal and nodoActual.abajo!= Entrada  and nodoActual.coordenadaX >= nodoFinal.coordenadaX:
                     if nodoActual.abajo.tipo == 'Entrada':
                         nodoActual.abajo.tipo = 'CaminandoEntrada'
@@ -1129,15 +1407,7 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
 
-                elif nodoActual.arriba != None and (nodoActual.arriba.tipo == 'Camino' or nodoActual.arriba.tipo == 'Entrada' or nodoActual.arriba.tipo == 'Civil') and nodoActual.arriba != nodoFinal and nodoActual.arriba != Entrada and nodoActual.coordenadaX >= nodoFinal.coordenadaX :
-                    if nodoActual.arriba.tipo == 'Entrada':
-                        nodoActual.arriba.tipo = 'CaminandoEntrada'
-                    elif nodoActual.arriba.tipo == 'Civil':
-                        nodoActual.arriba.tipo = 'CaminandoCivil'
-                    else:
-                        nodoActual.arriba.tipo = 'Caminando'
-                    #anterior = nodoActual
-                    nodoActual = nodoActual.arriba
+                
                 elif nodoActual.abajo != None and (nodoActual.abajo.tipo == 'Camino' or nodoActual.abajo.tipo == 'Entrada' or nodoActual.abajo.tipo == 'Civil') and nodoActual.abajo!= nodoFinal and nodoActual.abajo!= Entrada  and nodoActual.coordenadaX < nodoFinal.coordenadaX:
                     if nodoActual.abajo.tipo == 'Entrada':
                         nodoActual.abajo.tipo = 'CaminandoEntrada'
@@ -1177,27 +1447,27 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
                 #No ha llegado
-                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
@@ -1217,7 +1487,7 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 elif (nodoActual.abajo != None and nodoActual.abajo.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY) != False
                     and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoAPctual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
                     capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()
                     lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
@@ -1250,6 +1520,73 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
                 else:
+                    #No ha regresado al inicio
+                    if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.derecha.derecha.tipo == 'Entrada':
+                                nodoActual.derecha.derecha.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.derecha.derecha.tipo == 'Civil':
+                                nodoActual.derecha.derecha.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.derecha.derecha.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                    elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                        if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            else:
+                                nodoActual.izquierda.tipo = 'Caminando'
+                                nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                        if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.abajo.abajo
+                            elif nodoActual.abajo.abajo.tipo == 'Civil':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.abajo.abajo
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.abajo.abajo
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                        if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.arriba.arriba.tipo == 'Entrada':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.arriba.arriba
+                            elif nodoActual.arriba.arriba.tipo == 'Civil':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.arriba.arriba
+                            else:
+                                nodoActual.arriba.tipo = 'Caminando'
+                                nodoActual = nodoActual.arriba.arriba
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
                     #Retroceder
                     if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
                         if nodoActual.tipo == 'Entrada' or nodoActual.tipo == 'CaminandoEntrada':
@@ -1365,27 +1702,27 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     nodoActual = nodoActual.abajo
                 #No ha llegado
                 
-                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
@@ -1398,7 +1735,7 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
                     lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
-                    nodoActual.izquierda.tipo = 'Vencido'
+                    nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
                 
@@ -1439,6 +1776,76 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     nodoActual = nodoActual.abajo
                     
                 else:
+                    #No ha regresado al inicio
+                    if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.abajo.tipo == 'Civil':
+                                nodoActual.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                        if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            else:
+                                nodoActual.izquierda.tipo = 'Caminando'
+                                nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                        if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.abajo.abajo
+                            elif nodoActual.abajo.abajo.tipo == 'Civil':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.abajo.abajo
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.abajo.abajo
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
+                    elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                        if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.arriba.arriba.tipo == 'Entrada':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.arriba.arriba
+                            elif nodoActual.arriba.arriba.tipo == 'Civil':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.arriba.arriba
+                            else:
+                                nodoActual.arriba.tipo = 'Caminando'
+                                nodoActual = nodoActual.arriba.arriba
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
                     #Retroceder
                     if nodoActual.arriba != None and nodoActual.arriba.tipo == 'Caminando' :
                         if nodoActual.tipo == 'Entrada' or nodoActual.tipo == 'CaminandoEntrada':
@@ -1550,27 +1957,27 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     nodoActual = nodoActual.abajo
                 #No ha llegado
                 
-                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
@@ -1596,7 +2003,7 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
                     lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
-                    nodoActual.izquierda.tipo = 'Vencido'
+                    nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
                 
@@ -1624,6 +2031,74 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     #anterior = nodoActual
                     nodoActual = nodoActual.abajo
                 else:
+                    #No ha regresado al inicio
+                    if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.abajo.tipo == 'Civil':
+                                nodoActual.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
+                    elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                        if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            else:
+                                nodoActual.izquierda.tipo = 'Caminando'
+                                nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                        if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.abajo.abajo
+                            elif nodoActual.abajo.abajo.tipo == 'Civil':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.abajo.abajo
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.abajo.abajo
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                    elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                        if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.arriba.arriba.tipo == 'Entrada':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.arriba.arriba
+                            elif nodoActual.arriba.arriba.tipo == 'Civil':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.arriba.arriba
+                            else:
+                                nodoActual.arriba.tipo = 'Caminando'
+                                nodoActual = nodoActual.arriba.arriba
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
                     #Retroceder
                     if nodoActual.derecha != None and nodoActual.derecha.tipo == 'Caminando' :
                         if nodoActual.tipo == 'Entrada' or nodoActual.tipo == 'CaminandoEntrada':
@@ -1735,27 +2210,27 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                         nodoActual.arriba.tipo = 'Caminando'
                     nodoActual = nodoActual.arriba
                 #No ha llegado
-                elif nodoActual.izquierda != False and nodoActual.izquierda == nodoFinal :
+                elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.derecha != False and nodoActual.derecha == nodoFinal :
+                elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.abajo != False and nodoActual.abajo == nodoFinal :
+                elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
-                elif nodoActual.arriba != False and nodoActual.arriba == nodoFinal :
+                elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
                     nodoFinal.terminal = True
                     webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
                     break
@@ -1803,12 +2278,81 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
                     lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
-                    nodoActual.izquierda.tipo = 'Vencido'
+                    nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.arriba
                 
                 
                 else:
+                    #No ha regresado al inicio
+                    if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.abajo.tipo == 'Civil':
+                                nodoActual.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
+                    elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                        if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                                nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.izquierda.izquierda
+                            else:
+                                nodoActual.izquierda.tipo = 'Caminando'
+                                nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+                        
+                    elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                        if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.abajo.abajo
+                            elif nodoActual.abajo.abajo.tipo == 'Civil':
+                                nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.abajo.abajo
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.abajo.abajo
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
+                    elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                        if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.arriba.arriba.tipo == 'Entrada':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.arriba.arriba
+                            elif nodoActual.arriba.arriba.tipo == 'Civil':
+                                nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.arriba.arriba
+                            else:
+                                nodoActual.arriba.tipo = 'Caminando'
+                                nodoActual = nodoActual.arriba.arriba
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
+
                     #Retroceder
                     if nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'Caminando' :
                         if nodoActual.tipo == 'Entrada' or nodoActual.tipo == 'CaminandoEntrada':
@@ -1846,11 +2390,73 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                             nodoActual.tipo = 'Visitado'
                         nodoActual = nodoActual.arriba
             else:
-                ciudad.graficarNeatoOrdenar(ciudad.getCiudad(),ciudad)
-                nodoFinal.terminal = True
+                if nodoActual.derecha != None and nodoActual.derecha == Entrada :
+                        if (nodoActual.derecha.derecha.tipo == 'Camino' or nodoActual.derecha.derecha.tipo == 'Entrada' or nodoActual.derecha.derecha.tipo == 'Civil'):
+                            casillas_recorridas = 1
+                            if nodoActual.abajo.tipo == 'Entrada':
+                                nodoActual.abajo.tipo = 'CaminandoEntrada'
+                                nodoActual = nodoActual.derecha.derecha
+                            elif nodoActual.abajo.tipo == 'Civil':
+                                nodoActual.abajo.tipo = 'CaminandoCivil'
+                                nodoActual = nodoActual.derecha.derecha
+                            else:
+                                nodoActual.abajo.tipo = 'Caminando'
+                                nodoActual = nodoActual.derecha.derecha
+                        else:
+                            casillas_recorridas = 10000
+                            nodoFinal.terminal = True
+                            break
 
-                webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
-                break
+                elif nodoActual.izquierda != None and nodoActual.izquierda == Entrada :
+                    if nodoActual.izquierda.izquierda!= None and (nodoActual.izquierda.izquierda.tipo == 'Camino' or nodoActual.izquierda.izquierda.tipo == 'Entrada' or nodoActual.izquierda.izquierda.tipo == 'Civil'):
+                        casillas_recorridas = 1
+                        if nodoActual.izquierda.izquierda.tipo == 'Entrada':
+                            nodoActual.izquierda.izquierda.tipo = 'CaminandoEntrada'
+                            nodoActual = nodoActual.izquierda.izquierda
+                        elif nodoActual.izquierda.izquierda.tipo == 'Civil':
+                            nodoActual.izquierda.izquierda.tipo = 'CaminandoCivil'
+                            nodoActual = nodoActual.izquierda.izquierda
+                        else:
+                            nodoActual.izquierda.tipo = 'Caminando'
+                            nodoActual = nodoActual.izquierda.izquierda
+                    else:
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+                    
+                elif nodoActual.abajo != None and nodoActual.abajo == Entrada :
+                    if nodoActual.abajo.abajo != None and (nodoActual.abajo.abajo.tipo == 'Camino' or nodoActual.abajo.abajo.tipo == 'Entrada' or nodoActual.abajo.abajo.tipo == 'Civil'):
+                        casillas_recorridas = 1
+                        if nodoActual.abajo.abajo.tipo == 'Entrada':
+                            nodoActual.abajo.abajo.tipo = 'CaminandoEntrada'
+                            nodoActual = nodoActual.abajo.abajo
+                        elif nodoActual.abajo.abajo.tipo == 'Civil':
+                            nodoActual.abajo.abajo.tipo = 'CaminandoCivil'
+                            nodoActual = nodoActual.abajo.abajo
+                        else:
+                            nodoActual.abajo.tipo = 'Caminando'
+                            nodoActual = nodoActual.abajo.abajo
+                    else:
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
+
+                elif nodoActual.arriba!= None and nodoActual.arriba== Entrada :
+                    if nodoActual.arriba.arriba != None and (nodoActual.arriba.arriba.tipo == 'Camino' or nodoActual.arriba.arriba.tipo == 'Entrada' or nodoActual.arriba.arriba.tipo == 'Civil'):
+                        casillas_recorridas = 1
+                        if nodoActual.arriba.arriba.tipo == 'Entrada':
+                            nodoActual.arriba.arriba.tipo = 'CaminandoEntrada'
+                            nodoActual = nodoActual.arriba.arriba
+                        elif nodoActual.arriba.arriba.tipo == 'Civil':
+                            nodoActual.arriba.arriba.tipo = 'CaminandoCivil'
+                            nodoActual = nodoActual.arriba.arriba
+                        else:
+                            nodoActual.arriba.tipo = 'Caminando'
+                            nodoActual = nodoActual.arriba.arriba
+                    else:
+                        casillas_recorridas = 10000
+                        nodoFinal.terminal = True
+                        break
         nodoFinal.entrada_mas_cercana = None
         nodoFinal.distancia = 9999
 

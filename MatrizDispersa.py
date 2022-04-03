@@ -393,11 +393,11 @@ class MatrizDispersa():
                     contenido += '\n\tnode[label="" fillcolor="black" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
-                elif pivote_celda.tipo == 'Civil':
+                elif pivote_celda.tipo == 'Civil' or  pivote_celda.tipo == 'CaminandoCivil' or pivote_celda.tipo == 'VisitadoCivil':
                     contenido += '\n\tnode[label="" fillcolor="blue" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
-                elif pivote_celda.tipo == 'Entrada':
+                elif pivote_celda.tipo == 'Entrada' or pivote_celda.tipo == 'CaminandoEntrada' or pivote_celda.tipo == 'VisitadoEntrada':
                     contenido += '\n\tnode[label="" fillcolor="green" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
@@ -461,12 +461,3 @@ class MatrizDispersa():
         result = "PDF/matriz_{}.pdf".format(nombre)
         os.system("neato -Tpdf " + dot + " -o " + result)
 
-
-class Ordenar():
-    def Civiles():
-        pass
-    
-    def Recursos():
-        pass
-
-    
