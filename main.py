@@ -126,6 +126,8 @@ def elementTree(ruta):
                     for subsubchild in subchild:
                         if subsubchild.tag == 'nombre':
                             nombre = subsubchild.text
+                            if lista_matriz.search_item(nombre) != False:
+                                lista_matriz.eliminarCiudad(nombre)
                             f = open('Ciudades/'+subsubchild.text.replace(" ","") +'.txt','w')
                             print(subsubchild.text)
                         if subsubchild.tag == 'fila':

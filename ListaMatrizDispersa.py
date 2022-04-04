@@ -35,3 +35,20 @@ class ListaMatrizDispersa():
                 return n
             n = n.siguiente
         return False
+    
+    def eliminarCiudad(self, ciudad):
+        tmp = self.primero
+        while tmp is not None:
+            if tmp.ciudad == ciudad:
+                self.primero = tmp.siguiente
+                tmp.siguiente = None
+                print('Estudiante',ciudad, 'eliminado.')
+                break
+            elif tmp.siguiente is not None:
+                if tmp.siguiente.ciudad == ciudad:
+                    Nodo_a_borrar = tmp.siguiente
+                    tmp.siguiente = Nodo_a_borrar.siguiente
+                    Nodo_a_borrar.siguiente = None
+                    print('Estudiante', ciudad,'eliminado.')
+                    break
+            tmp = tmp.siguiente
