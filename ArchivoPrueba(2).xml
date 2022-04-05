@@ -23,20 +23,20 @@
             <fila numero="3">"** ****** ** ** ****"</fila>
             <fila numero="4">"**   **** ** ** ****"</fila>
             <fila numero="5">"**** ****       ****"</fila>
-            <fila numero="6">"**** **** ** ** **C*"</fila>
+            <fila numero="6">"**** **** ** ** ** *"</fila>
             <fila numero="7">"E    **** ** ** ** *"</fila>
             <fila numero="8">"*** ***** ** ** ** *"</fila>
             <fila numero="9">"***       ** **    *"</fila>
             <fila numero="10">"*** ** ** ** ** ****"</fila>
-            <fila numero="11">"*** ** **R** ** ****"</fila>
+            <fila numero="11">"*** ** ** ** ** ****"</fila>
             <fila numero="12">"*** ** ***** ** ****"</fila>
-            <fila numero="13">"R      ** ** ** ****"</fila>
+            <fila numero="13">"       ** ** ** ****"</fila>
             <fila numero="14">"** ***             E"</fila>
-            <fila numero="15">"** *** *** ****** **"</fila>
+            <fila numero="15">"** ***C*** ****** **"</fila>
             <fila numero="16">"** *** *** **   * **"</fila>
-            <fila numero="17">"**C*** ***    *   **"</fila>
+            <fila numero="17">"**C***C***    *   **"</fila>
             <fila numero="18">"** ************** **"</fila>
-            <fila numero="19">"**         ******C**"</fila>
+            <fila numero="19">"**         ****** **"</fila>
             <fila numero="20">"******E*************"</fila>
             <unidadMilitar fila="5" columna="15">40</unidadMilitar>
             <unidadMilitar fila="9" columna="9">15</unidadMilitar>

@@ -82,29 +82,51 @@ class MatrizDispersa():
             tmp = tmp.siguiente
         return None
 
+    def getNodoPorTipo(self,tipo):
+            tmp = self.filas.primero
+            while(tmp is not None):
+                nodoTmp = tmp.acceso
+                while(nodoTmp is not None):
+                    if(str(nodoTmp.tipo) == str(tipo)):
+                        return nodoTmp
+                    nodoTmp = nodoTmp.derecha
+                tmp = tmp.siguiente
+            return None
     def showNodoCivil(self):
+        self.setCiviles(0)
         tmp = self.filas.primero
         txt = ''
         while(tmp is not None):
             nodoTmp = tmp.acceso
             while(nodoTmp is not None):
                 if(str(nodoTmp.tipo) == 'Civil'):
+                    self.setCiviles(int(self.getCiviles()) + 1)
                     txt += '-Fila: ' + str(nodoTmp.coordenadaX) + ' -Columna: ' + str(nodoTmp.coordenadaY) + '\n'
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
-        return txt
+        if int(self.getCiviles()) <= 1:
+            return '1' 
+        else:
+            return txt
+            
+
     
     def showNodoRecurso(self):
+        self.setRecursos(0)
         tmp = self.filas.primero
         txt = ''
         while(tmp is not None):
             nodoTmp = tmp.acceso
             while(nodoTmp is not None):
                 if(str(nodoTmp.tipo) == 'Recurso'):
+                    self.setRecursos(int(self.getRecursos()) + 1)
                     txt += '-Fila: ' + str(nodoTmp.coordenadaX) + ' -Columna: ' + str(nodoTmp.coordenadaY) + '\n'
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
-        return txt
+        if int(self.getRecursos()) <= 1:
+            return '1' 
+        else:
+            return txt
     
     def showNodoEntrada(self):
         tmp = self.filas.primero
@@ -216,18 +238,18 @@ class MatrizDispersa():
 
     def graficarNeato(self, nombre,matriz):
         contenido = '''digraph G{
-    node[shape=box, width=0.7, height=0.7, fontname="Arial", fillcolor="white", style=filled]
-    edge[style = "bold"]
-    node[label = "capa:''' + str(self.capa) +'''" fillcolor="darkolivegreen1" pos = "-1,1!"]raiz;'''
+    node[shape=box, width=1, height=1, fontname="Arial", fillcolor="white", style=filled]
+    edge[style = "invis" arrowhead="none" arrowtail="none"]
+    node[label = "0,0" fillcolor="darkolivegreen1" pos = "-1,1!"]raiz;'''
         contenido += '''label = "{}" \nfontname="Arial Black" \nfontsize="25pt" \n
-                    \n'''.format('\nMATRIZ DISPERSA')
+                    \n'''.format(nombre)
 
         # --graficar nodos ENCABEZADO
         # --graficar nodos fila
         pivote = self.filas.primero
         posx = 0
         while pivote != None:
-            contenido += '\n\tnode[label = "F{}" fillcolor="azure3" pos="-1,-{}!" shape=box]x{};'.format(pivote.id, 
+            contenido += '\n\tnode[label = "{}" fillcolor="azure" pos="-1,-{}!" shape=box]x{};'.format(pivote.id, 
             posx, pivote.id)
             pivote = pivote.siguiente
             posx += 1
@@ -242,7 +264,7 @@ class MatrizDispersa():
         pivotey = self.columnas.primero
         posy = 0
         while pivotey != None:
-            contenido += '\n\tnode[label = "C{}" fillcolor="azure3" pos = "{},1!" shape=box]y{};'.format(pivotey.id, 
+            contenido += '\n\tnode[label = "{}" fillcolor="azure" pos = "{},1!" shape=box]y{};'.format(pivotey.id, 
             posy, pivotey.id)
             pivotey = pivotey.siguiente
             posy += 1
@@ -278,7 +300,7 @@ class MatrizDispersa():
                     )
                 elif pivote_celda.caracter == 'C':
                     pivote_celda.tipo = 'Civil'
-                    matriz.setCiviles(int(matriz.getCiviles()) + 1)
+                    
                     contenido += '\n\tnode[label="" fillcolor="blue" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
@@ -333,24 +355,32 @@ class MatrizDispersa():
         dot = "PDF/matriz_{}_dot.txt".format(nombre)
         with open(dot, 'w') as grafo:
             grafo.write(contenido)
-        result = "PDF/matriz_{}.pdf".format(nombre)
+        result = "matriz_{}.pdf".format(nombre)
         os.system("neato -Tpdf " + dot + " -o " + result)
         #webbrowser.open(result)
 
-    def graficarNeatoOrdenar(self, nombre,matriz):
+    def graficarNeatoOrdenar(self, nombre,matriz,robot,nodoFinal,fuerzaInicial):
         contenido = '''digraph G{
-    node[shape=box, width=0.7, height=0.7, fontname="Arial", fillcolor="white", style=filled]
-    edge[style = "bold"]
-    node[label = "capa:''' + str(self.capa) +'''" fillcolor="darkolivegreen1" pos = "-1,1!"]raiz;'''
-        contenido += '''label = "{}" \nfontname="Arial Black" \nfontsize="25pt" \n
-                    \n'''.format('\nMATRIZ DISPERSA')
+    node[shape=box, width=1, height=1, fontname="Arial", fillcolor="white", style=filled]
+    edge[style = "invis" arrowhead="none" arrowtail="none"]
+    node[label = "0,0" fillcolor="azure" pos = "-1,1!"]raiz;'''
+        if robot.getTipo() == 'ChapinFighter':
+            contenido += '''label = "{}" \nfontname="Arial Black" \nfontsize="25pt" \n
+                        \n'''.format('Tipo de misión: Extracción de recursos'  +'\n Recurso extraido: ' + str(nodoFinal.coordenadaY) + ',' + str(nodoFinal.coordenadaX)
+                        +'\n Robot utilizado: ' + str(robot.getNombre()) + '(ChapinFighter - Capacidad de combate inicial '+str(fuerzaInicial) +', Capacidad de combate final '+str(robot.getFuerza())+')'
+                        )
+        elif robot.getTipo() == 'ChapinRescue':
+            contenido += '''label = "{}" \nfontname="Arial Black" \nfontsize="25pt" \n
+                    \n'''.format('Tipo de misión: Rescate'  +'\n Unidad civil rescatada: ' + str(nodoFinal.coordenadaY) + ',' + str(nodoFinal.coordenadaX)
+                    +'\n Robot utilizado: ' + str(robot.getNombre()) + '(ChapinRescue)'
+                    )
 
         # --graficar nodos ENCABEZADO
         # --graficar nodos fila
         pivote = self.filas.primero
         posx = 0
         while pivote != None:
-            contenido += '\n\tnode[label = "F{}" fillcolor="azure3" pos="-1,-{}!" shape=box]x{};'.format(pivote.id, 
+            contenido += '\n\tnode[label = "{}" fillcolor="azure" pos="-1,-{}!" shape=box]x{};'.format(pivote.id, 
             posx, pivote.id)
             pivote = pivote.siguiente
             posx += 1
@@ -365,7 +395,7 @@ class MatrizDispersa():
         pivotey = self.columnas.primero
         posy = 0
         while pivotey != None:
-            contenido += '\n\tnode[label = "C{}" fillcolor="azure3" pos = "{},1!" shape=box]y{};'.format(pivotey.id, 
+            contenido += '\n\tnode[label = "{}" fillcolor="azure" pos = "{},1!" shape=box]y{};'.format(pivotey.id, 
             posy, pivotey.id)
             pivotey = pivotey.siguiente
             posy += 1
@@ -393,12 +423,20 @@ class MatrizDispersa():
                     contenido += '\n\tnode[label="" fillcolor="black" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
-                elif pivote_celda.tipo == 'Civil' or  pivote_celda.tipo == 'CaminandoCivil' or pivote_celda.tipo == 'VisitadoCivil':
+                elif pivote_celda.tipo == 'Civil' or pivote_celda.tipo == 'VisitadoCivil':
                     contenido += '\n\tnode[label="" fillcolor="blue" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
-                elif pivote_celda.tipo == 'Entrada' or pivote_celda.tipo == 'CaminandoEntrada' or pivote_celda.tipo == 'VisitadoEntrada':
+                elif pivote_celda.tipo == 'CaminandoCivil':
+                    contenido += '\n\tnode[label="" fillcolor="blue4" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                        posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
+                    )
+                elif pivote_celda.tipo == 'Entrada' or pivote_celda.tipo == 'VisitadoEntrada':
                     contenido += '\n\tnode[label="" fillcolor="green" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
+                        posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
+                    )
+                elif  pivote_celda.tipo == 'CaminandoEntrada':
+                    contenido += '\n\tnode[label="" fillcolor="greenyellow" pos="{},-{}!" shape=box]i{}_{};'.format( #pos="{},-{}!"
                         posy_celda, posx, pivote_celda.coordenadaX, pivote_celda.coordenadaY
                     )
                 elif pivote_celda.tipo == 'Caminando':
@@ -458,6 +496,6 @@ class MatrizDispersa():
         dot = "PDF/matriz_{}_dot.txt".format(nombre)
         with open(dot, 'w') as grafo:
             grafo.write(contenido)
-        result = "PDF/matriz_{}.pdf".format(nombre)
+        result = "matriz_{}.pdf".format(nombre)
         os.system("neato -Tpdf " + dot + " -o " + result)
 

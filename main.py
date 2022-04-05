@@ -7,12 +7,12 @@ from listaUnidadMilitar import ListaUnidadMilitar
 import xml.etree.ElementTree as ET
 
 
-nombre_archivo = []
+
 lista_matriz = ListaMatrizDispersa()
 lista_robots = ListaRobot()
 
 def ObtenerArchivo():
-
+    global nombre_archivo
     sg.theme('Purple')
 
     layout = [[sg.Text('Archivo .xml')],
@@ -26,7 +26,7 @@ def ObtenerArchivo():
             window.close()
     else:
         print('Escogiste el archivo: ',values[0])
-        nombre_archivo.append(values[0])
+        nombre_archivo = values[0]
         elementTree(values[0])
         window.close()
         Interfaz()
@@ -34,7 +34,7 @@ def ObtenerArchivo():
 def Interfaz():
 
     layout = [[sg.Text('Archivo seleccionado')],
-            [sg.Text(nombre_archivo[0])],
+            [sg.Text(nombre_archivo)],
             [sg.Button('Mision de rescate de civil')], [sg.Button('Mision de rescate de recursos')],[sg.Button('Cambiar archivo seleccionado')]]
 
     window = sg.Window('Menú Principal', layout, enable_close_attempted_event=True)
@@ -45,9 +45,10 @@ def Interfaz():
             ciudad = sg.popup_get_text(lista_matriz.showCiudades(),'Esoge una ciudad' )
             if lista_matriz.search_item(ciudad) != False:
                 insertaTodo(ciudad) 
+                lista_matriz.search_item(ciudad).showNodoCivil()
                 if lista_matriz.search_item(ciudad).getCiviles() > 0:
                     
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.replace(" ","")+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.replace(" ","")+'.pdf')
                     robot = sg.popup_get_text(lista_robots.showRobotsRescue(),'Esoge una un robot' )
                     if lista_robots.search_item(robot,'ChapinRescue'):
                         print('Exito')
@@ -63,8 +64,9 @@ def Interfaz():
             ciudad = sg.popup_get_text(lista_matriz.showCiudades(),'Esoge una ciudad' )
             if lista_matriz.search_item(ciudad) != False:
                 insertaTodo(ciudad) 
+                lista_matriz.search_item(ciudad).showNodoRecurso()
                 if lista_matriz.search_item(ciudad).getRecursos() > 0:
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.replace(" ","")+'.pdf')
                     robot = sg.popup_get_text(lista_robots.showRobotsFighter(),'Esoge una un robot' )
                     if lista_robots.search_item(robot,'ChapinFighter') != False:
                         print('Exito')
@@ -100,21 +102,6 @@ def insertaTodo(ciudad):
             c = 0
             matriz.graficarNeato(ciudad.replace(" ",""),matriz)
 
-def insertarTodoOrdenado(ciudad):
-    matriz = lista_matriz.search_item(ciudad)    
-    with open('Ciudades/'+ciudad.replace(" ","")+'.txt') as archivo:
-        l = 0
-        c = 0
-        lineas = archivo.readlines()
-        for linea in lineas:
-            columnas = linea.replace('"','')
-            l += 1
-            for col in columnas:
-                if col != '\n':
-                    c += 1
-                    matriz.insert(l, c, col)
-            c = 0
-            matriz.graficarNeatoOrdenar(ciudad.replace(" ",""),matriz)
 
 def elementTree(ruta):
         tree = ET.parse(ruta)
@@ -146,7 +133,14 @@ def elementTree(ruta):
                                 lista_robots.insertLastRobot(subsubchild.text,'0',subsubchild.attrib['tipo'])
 
 def CaminoCortoParaCivil(ciudad,robot):
-    nodoFinal = ciudad.getNodo(sg.popup_get_text('Fila del Civil \n' + ciudad.showNodoCivil(),'Fila'),sg.popup_get_text('Columna del Civil \n' + ciudad.showNodoCivil(),'Columna'))
+    civiles = ciudad.showNodoCivil()
+    if civiles == '1':
+        sg.popup_ok('La unidad civil se escogió automaticamente porque solo existe una \n ',title='Civil')
+        nodoFinal = ciudad.getNodoPorTipo('Civil')
+        print(civiles)
+    else:
+        nodoFinal = ciudad.getNodo(sg.popup_get_text('Fila del Civil \n' + civiles,'Fila'),sg.popup_get_text('Columna del Civil \n' + civiles,'Columna'))
+        print(civiles)
     if nodoFinal != False and nodoFinal.tipo == 'Civil':
         tmp = ciudad.filas.primero
         while(tmp is not None):
@@ -160,17 +154,24 @@ def CaminoCortoParaCivil(ciudad,robot):
                         nodoFinal.terminal = False
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
+        if nodoFinal != False and nodoFinal.getEntrada() != None:
+            recorrerCiudadFinal(nodoFinal,ciudad,robot)
+            print('Listo')
+            webbrowser.open('matriz_'+str(ciudad.getCiudad()).replace(" ","")+'.pdf')
+        else:
+            sg.popup_error('No hay forma de llegar al civil :(')
     else:
         sg.popup_error('La posición indicada no tiene ningún civil')
-    if nodoFinal != False and nodoFinal.getEntrada() != None:
-        recorrerCiudadFinal(nodoFinal,ciudad,robot)
-        print('Listo')
-        webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+str(ciudad.getCiudad()).replace(" ","")+'.pdf')
-    else:
-        sg.popup_error('No hay forma de llegar al civil :(')
+    
             
 def CaminoCortoParaRecurso(ciudad,robot):
-    nodoFinal = ciudad.getNodo(sg.popup_get_text('Fila del Recurso \n' + ciudad.showNodoRecurso(),'Fila'),sg.popup_get_text('Columna del Recurso \n' + ciudad.showNodoRecurso(),'Columna'))
+    recurso = ciudad.showNodoRecurso()
+    if recurso == '1':
+        sg.popup_ok('El recurso se escogió automaticamente porque solo existe uno \n ',title='Recurso')
+        nodoFinal = ciudad.getNodoPorTipo('Recurso')
+        print(recurso)
+    else:
+        nodoFinal = ciudad.getNodo(sg.popup_get_text('Fila del Recurso \n' + recurso,'Fila'),sg.popup_get_text('Columna del Recurso \n' + recurso,'Columna'))
     if nodoFinal != False and nodoFinal.tipo == 'Recurso':
         tmp = ciudad.filas.primero
         while(tmp is not None):
@@ -184,20 +185,24 @@ def CaminoCortoParaRecurso(ciudad,robot):
                         nodoFinal.terminal = False
                 nodoTmp = nodoTmp.derecha
             tmp = tmp.siguiente
+        if nodoFinal != False and nodoFinal.getEntrada() != None:
+            recorrerCiudadFinal(nodoFinal,ciudad,robot)
+            print('Listo')
+            webbrowser.open('matriz_'+str(ciudad.getCiudad()).replace(" ","")+'.pdf')
+        else:
+            sg.popup_error('No hay forma de llegar al Recurso :(')
     else:
         sg.popup_error('La posición indicada no tiene ningún recurso')
-    if nodoFinal != False and nodoFinal.getEntrada() != None:
-        recorrerCiudadFinal(nodoFinal,ciudad,robot)
-        print('Listo')
-        webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+str(ciudad.getCiudad()).replace(" ","")+'.pdf')
-    else:
-        sg.popup_error('No hay forma de llegar al Recurso :(')
+    
 
 def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
         nodoFinal.terminal = False
         fuerza_tmp = 0
         if lista_robots.search_item(robot,'ChapinFighter') != False :
             fuerza_tmp = int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())
+            robot = lista_robots.search_item(robot,'ChapinFighter')
+        else:
+            robot = lista_robots.search_item(robot,'ChapinRescue')
         Entrada = nodoActual
         ciudad.limpiarCaminos()
         casillas_recorridas = 0
@@ -298,11 +303,11 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                 #No hay que pelear                
                 elif (nodoActual.derecha != None and nodoActual.derecha.tipo == 'UnidadMilitar'
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.derecha.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -310,11 +315,11 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                 
                 elif (nodoActual.abajo != None and nodoActual.abajo.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.abajo.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -322,23 +327,23 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                     
                 elif (nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY) != False 
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
                     casillas_recorridas += 1
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     nodoActual.izquierda.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
 
                 elif (nodoActual.arriba != None and nodoActual.arriba.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -587,11 +592,11 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                 #No hay que pelear     
                 elif (nodoActual.arriba != None and nodoActual.arriba.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -599,23 +604,23 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                 
                 elif (nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY) != False 
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
                     casillas_recorridas += 1
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     nodoActual.izquierda.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
 
                 elif (nodoActual.derecha != None and nodoActual.derecha.tipo == 'UnidadMilitar'
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.derecha.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -623,11 +628,11 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                 
                 elif (nodoActual.abajo != None and nodoActual.abajo.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.abajo.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -860,11 +865,11 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
 
                 elif (nodoActual.derecha != None and nodoActual.derecha.tipo == 'UnidadMilitar'
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.derecha.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -872,11 +877,11 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                 
                 elif (nodoActual.arriba != None and nodoActual.arriba.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -884,23 +889,23 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                 
                 elif (nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY) != False 
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
                     casillas_recorridas += 1
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     nodoActual.izquierda.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
                 
                 elif (nodoActual.abajo != None and nodoActual.abajo.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.abajo.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1124,34 +1129,34 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                 #No hay que pelear   
                 elif (nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY) != False 
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
                     casillas_recorridas += 1
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     nodoActual.izquierda.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
                 
                 elif (nodoActual.abajo != None and nodoActual.abajo.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.abajo.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.abajo
                 elif (nodoActual.derecha != None and nodoActual.derecha.tipo == 'UnidadMilitar'
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.derecha.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1159,11 +1164,11 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                 
                 elif (nodoActual.arriba != None and nodoActual.arriba.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1354,13 +1359,18 @@ def recorrerCiudad(nodoFinal,nodoActual,ciudad,robot):
                             nodoFinal.terminal = True
                             break
 
-        if lista_robots.search_item(robot,'ChapinFighter') != False :
-            lista_robots.search_item(robot,'ChapinFighter').setFuerza(fuerza_tmp )
+        if lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False :
+            lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(fuerza_tmp )
         ciudad.limpiarCaminos()
         return casillas_recorridas
 
 def recorrerCiudadFinal(nodoFinal,ciudad,robot):
-
+        fuerza_tmp = 0
+        if lista_robots.search_item(robot,'ChapinFighter') != False :
+            fuerza_tmp = int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())
+            robot = lista_robots.search_item(robot,'ChapinFighter')
+        else:
+            robot = lista_robots.search_item(robot,'ChapinRescue')
         ciudad.limpiarCaminos()
         nodoActual = nodoFinal.getEntrada()
         Entrada = nodoActual
@@ -1451,36 +1461,40 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 #No ha llegado
                 elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 #No hay que pelear                
                 elif (nodoActual.derecha != None and nodoActual.derecha.tipo == 'UnidadMilitar'
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.derecha.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1488,11 +1502,11 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 
                 elif (nodoActual.abajo != None and nodoActual.abajo.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoAPctual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.abajo.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1500,23 +1514,23 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                     
                 elif (nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY) != False 
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
                     casillas_recorridas += 1
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     nodoActual.izquierda.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
 
                 elif (nodoActual.arriba != None and nodoActual.arriba.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.izquierda.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1706,36 +1720,40 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 
                 elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 #No hay que pelear     
                 elif (nodoActual.arriba != None and nodoActual.arriba.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1743,23 +1761,23 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 
                 elif (nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY) != False 
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
                     casillas_recorridas += 1
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     nodoActual.izquierda.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
 
                 elif (nodoActual.derecha != None and nodoActual.derecha.tipo == 'UnidadMilitar'
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.derecha.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1767,11 +1785,11 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 
                 elif (nodoActual.abajo != None and nodoActual.abajo.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.abajo.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1961,37 +1979,41 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 
                 elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 #No hay que pelear   
 
                 elif (nodoActual.derecha != None and nodoActual.derecha.tipo == 'UnidadMilitar'
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.derecha.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -1999,11 +2021,11 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 
                 elif (nodoActual.arriba != None and nodoActual.arriba.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -2011,23 +2033,23 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 
                 elif (nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY) != False 
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
                     casillas_recorridas += 1
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     nodoActual.izquierda.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
                 
                 elif (nodoActual.abajo != None and nodoActual.abajo.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.abajo.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -2214,59 +2236,63 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 #No ha llegado
                 elif nodoActual.izquierda != None and nodoActual.izquierda == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.derecha != None and nodoActual.derecha == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.abajo != None and nodoActual.abajo == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 elif nodoActual.arriba != None and nodoActual.arriba == nodoFinal :
                     nodoActual.tipo = 'Caminando'
-                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad)
+                    ciudad.graficarNeatoOrdenar(ciudad.getCiudad().replace(" ",""),ciudad,robot,nodoFinal,fuerza_tmp)
+                    robot.setFuerza(fuerza_tmp)
                     nodoFinal.terminal = True
-                    webbrowser.open('C:/Users/Angel/Desktop/VSCode/Carpeta para Github/Proyecto 2 IPC2/PDF/matriz_'+ciudad.getCiudad()+'.pdf')
+                    webbrowser.open('matriz_'+ciudad.getCiudad().replace(" ","")+'.pdf')
                     break
                 #No hay que pelear   
                 elif (nodoActual.izquierda != None and nodoActual.izquierda.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY) != False 
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
                     casillas_recorridas += 1
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.izquierda.coordenadaX,nodoActual.izquierda.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     nodoActual.izquierda.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.izquierda
                 
                 elif (nodoActual.abajo != None and nodoActual.abajo.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.abajo.coordenadaX,nodoActual.abajo.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.abajo.tipo = 'Vencido'
                     #anterior = nodoActual
                     nodoActual = nodoActual.abajo
                 elif (nodoActual.derecha != None and nodoActual.derecha.tipo == 'UnidadMilitar'
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.derecha.coordenadaX,nodoActual.derecha.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.derecha.tipo = 'Vencido'
                     #anterior = nodoActual
@@ -2274,11 +2300,11 @@ def recorrerCiudadFinal(nodoFinal,ciudad,robot):
                 
                 elif (nodoActual.arriba != None and nodoActual.arriba.tipo == 'UnidadMilitar' 
                     and ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY) != False
-                    and lista_robots.search_item(robot,'ChapinFighter') != False
-                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(robot,'ChapinFighter').getFuerza())):
-                    capacidad1 = lista_robots.search_item(robot,'ChapinFighter').getFuerza()
+                    and lista_robots.search_item(str(robot.getNombre()),'ChapinFighter') != False
+                    and  int(ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()) <= int(lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza())):
+                    capacidad1 = lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').getFuerza()
                     capacidad2 = ciudad.getUnidadesMilitares().search_item(nodoActual.arriba.coordenadaX,nodoActual.arriba.coordenadaY).getFuerza()
-                    lista_robots.search_item(robot,'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
+                    lista_robots.search_item(str(robot.getNombre()),'ChapinFighter').setFuerza(int(capacidad1) - int(capacidad2))
                     casillas_recorridas += 1
                     nodoActual.arriba.tipo = 'Vencido'
                     #anterior = nodoActual
