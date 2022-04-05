@@ -160,25 +160,23 @@ class MatrizDispersa():
     # (filas = x, columnas = y)
     def insert(self, pos_x, pos_y, caracter):
         nuevo = Nodo_Interno(pos_x, pos_y, caracter) # se crea nodo interno
-        # --- lo prinero sera buscar si ya existen los encabezados en la matriz
+
         nodo_X = self.filas.getEncabezado(pos_x)
         nodo_Y = self.columnas.getEncabezado(pos_y)
 
-        if nodo_X == None: # --- comprobamos que el encabezado fila pos_x exista
-             # --- si nodo_X es nulo, quiere decir que no existe encabezado fila pos_x
+        if nodo_X == None: 
             nodo_X = Nodo_Encabezado(pos_x)
             self.filas.insertar_nodoEncabezado(nodo_X)
 
-        if nodo_Y == None: # --- comprobamos que el encabezado columna pos_y exista
-            # --- si nodo_Y es nulo, quiere decir que no existe encabezado columna pos_y
+        if nodo_Y == None: 
             nodo_Y = Nodo_Encabezado(pos_y)
             self.columnas.insertar_nodoEncabezado(nodo_Y)
 
         # ----- INSERTAR NUEVO EN FILA
-        if nodo_X.acceso == None: # -- comprobamos que el nodo_x no esta apuntando hacia ningun nodoInterno
+        if nodo_X.acceso == None: 
             nodo_X.acceso = nuevo
-        else: # -- si esta apuntando, validamos si la posicion de la columna del NUEVO nodoInterno es menor a la posicion de la columna del acceso 
-            if nuevo.coordenadaY < nodo_X.acceso.coordenadaY: # F1 --->  NI 1,1     NI 1,3
+        else:
+            if nuevo.coordenadaY < nodo_X.acceso.coordenadaY: 
                 nuevo.derecha = nodo_X.acceso              
                 nodo_X.acceso.izquierda = nuevo
                 nodo_X.acceso = nuevo
@@ -201,14 +199,11 @@ class MatrizDispersa():
                             break;
                         else:
                             tmp = tmp.derecha 
-                             #         nodo_Y:        C1    C3      C5      C6
-                             # nodo_X:F1 --->      NI 1,2; NI 1,3; NI 1,5; NI 1,6;
-                             # nodo_X:F2 --->      NI 2,2; NI 2,3; NI 2,5; NI 2,6;
-
+           
         # ----- INSERTAR NUEVO EN COLUMNA
-        if nodo_Y.acceso == None:  # -- comprobamos que el nodo_y no esta apuntando hacia ningun nodoCelda
+        if nodo_Y.acceso == None:
             nodo_Y.acceso = nuevo
-        else: # -- si esta apuntando, validamos si la posicion de la fila del NUEVO nodoCelda es menor a la posicion de la fila del acceso 
+        else: 
             if nuevo.coordenadaX < nodo_Y.acceso.coordenadaX:
                 nuevo.abajo = nodo_Y.acceso
                 nodo_Y.acceso.arriba = nuevo
@@ -233,7 +228,7 @@ class MatrizDispersa():
                         else:
                             tmp2 = tmp2.abajo
 
-        ##------ Fin de insercion
+
 
 
     def graficarNeato(self, nombre,matriz):
@@ -270,7 +265,7 @@ class MatrizDispersa():
             posy += 1
         pivotey = self.columnas.primero
         while pivotey.siguiente != None:
-            contenido += '\n\ty{}->y{}[color="white"];'. format(pivotey.id, pivotey.siguiente.id)
+            contenido += '\n\ty{}->y{}[color="white"];'.format(pivotey.id, pivotey.siguiente.id)
             contenido += '\n\ty{}->y{}[dir=back color="white"];'.format(pivotey.id, pivotey.siguiente.id)
             pivotey = pivotey.siguiente
         contenido += '\n\traiz->y{}[color="white"];'.format(self.columnas.primero.id)
@@ -357,7 +352,7 @@ class MatrizDispersa():
             grafo.write(contenido)
         result = "matriz_{}.pdf".format(nombre)
         os.system("neato -Tpdf " + dot + " -o " + result)
-        #webbrowser.open(result)
+
 
     def graficarNeatoOrdenar(self, nombre,matriz,robot,nodoFinal,fuerzaInicial):
         contenido = '''digraph G{

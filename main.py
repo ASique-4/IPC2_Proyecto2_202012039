@@ -55,11 +55,17 @@ def Interfaz():
                         CaminoCortoParaCivil(lista_matriz.search_item(ciudad),robot)
                         pass
                     else:
-                        sg.popup_error('El robot: "' + robot + '" no existe',title = 'Robot no encontrado')
+                        if robot != None:
+                            sg.popup_error('El robot: "' + robot + '" no existe',title = 'Robot no encontrado')
+                        else:
+                            sg.popup_error('No se escogió ningun robot')
                 else:
                     sg.popup_error('La ciudad: "' + ciudad + '" no tiene unidades civiles',title = 'Sin unidades civiles')
             else:
-                sg.popup_error('La ciudad: "' + ciudad + '" no existe',title = 'Ciudad no encontrada')
+                if ciudad != None:
+                    sg.popup_error('La ciudad: "' + ciudad + '" no existe',title = 'Ciudad no encontrada')
+                else:
+                    sg.popup_error('No se escogió una ciudad')
         if (event == 'Mision de rescate de recursos'):
             ciudad = sg.popup_get_text(lista_matriz.showCiudades(),'Esoge una ciudad' )
             if lista_matriz.search_item(ciudad) != False:
@@ -72,11 +78,18 @@ def Interfaz():
                         print('Exito')
                         CaminoCortoParaRecurso(lista_matriz.search_item(ciudad),robot)
                     else:
-                        sg.popup_error('El robot: "' + robot + '" no existe',title = 'Robot no encontrado')
+                        if robot != None:
+                            sg.popup_error('El robot: "' + robot + '" no existe',title = 'Robot no encontrado')
+                        else:
+                            sg.popup_error('No se escogió ningun robot')
+                        
                 else:
                     sg.popup_error('La ciudad: "' + ciudad + '" no tiene recursos',title = 'Sin recursos')
             else:
-                sg.popup_error('La ciudad: "' + ciudad + '" no existe',title = 'Ciudad no encontrada')
+                if ciudad != None:
+                    sg.popup_error('La ciudad: "' + ciudad + '" no existe',title = 'Ciudad no encontrada')
+                else:
+                    sg.popup_error('No se escogió una ciudad')
         if (event == 'Cambiar archivo seleccionado'):
             window.close()
             ObtenerArchivo()
@@ -127,8 +140,8 @@ def elementTree(ruta):
                 if subchild.tag == 'robot':
                     for subsubchild in subchild:
                         if subsubchild.tag == 'nombre':
-                            if lista_robots.search_item(subsubchild.text) != False:
-                                lista_matriz.eliminarCiudad(subsubchild.text)
+                            if lista_robots.search_item(subsubchild.text,subsubchild.attrib['tipo']) != False:
+                                lista_robots.eliminarRobot(subsubchild.text)
                             if 'capacidad' in subsubchild.attrib:
                                 lista_robots.insertLastRobot(subsubchild.text,subsubchild.attrib['capacidad'],subsubchild.attrib['tipo'])
                             else:
@@ -143,7 +156,7 @@ def CaminoCortoParaCivil(ciudad,robot):
     else:
         nodoFinal = ciudad.getNodo(sg.popup_get_text('Fila del Civil \n' + civiles,'Fila'),sg.popup_get_text('Columna del Civil \n' + civiles,'Columna'))
         print(civiles)
-    if nodoFinal != False and nodoFinal.tipo == 'Civil':
+    if nodoFinal != None and nodoFinal != False and nodoFinal.tipo == 'Civil':
         tmp = ciudad.filas.primero
         while(tmp is not None):
             nodoTmp = tmp.acceso
@@ -174,7 +187,7 @@ def CaminoCortoParaRecurso(ciudad,robot):
         print(recurso)
     else:
         nodoFinal = ciudad.getNodo(sg.popup_get_text('Fila del Recurso \n' + recurso,'Fila'),sg.popup_get_text('Columna del Recurso \n' + recurso,'Columna'))
-    if nodoFinal != False and nodoFinal.tipo == 'Recurso':
+    if nodoFinal != None and nodoFinal != False and nodoFinal.tipo == 'Recurso':
         tmp = ciudad.filas.primero
         while(tmp is not None):
             nodoTmp = tmp.acceso
