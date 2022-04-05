@@ -366,12 +366,12 @@ class MatrizDispersa():
     node[label = "0,0" fillcolor="azure" pos = "-1,1!"]raiz;'''
         if robot.getTipo() == 'ChapinFighter':
             contenido += '''label = "{}" \nfontname="Arial Black" \nfontsize="25pt" \n
-                        \n'''.format('Tipo de misión: Extracción de recursos'  +'\n Recurso extraido: ' + str(nodoFinal.coordenadaY) + ',' + str(nodoFinal.coordenadaX)
+                        \n'''.format('Tipo de misión: Extracción de recursos'  +'\n Recurso extraido: ' + str(nodoFinal.coordenadaX) + ',' + str(nodoFinal.coordenadaY)
                         +'\n Robot utilizado: ' + str(robot.getNombre()) + '(ChapinFighter - Capacidad de combate inicial '+str(fuerzaInicial) +', Capacidad de combate final '+str(robot.getFuerza())+')'
                         )
         elif robot.getTipo() == 'ChapinRescue':
             contenido += '''label = "{}" \nfontname="Arial Black" \nfontsize="25pt" \n
-                    \n'''.format('Tipo de misión: Rescate'  +'\n Unidad civil rescatada: ' + str(nodoFinal.coordenadaY) + ',' + str(nodoFinal.coordenadaX)
+                    \n'''.format('Tipo de misión: Rescate'  +'\n Unidad civil rescatada: ' + str(nodoFinal.coordenadaX) + ',' + str(nodoFinal.coordenadaY)
                     +'\n Robot utilizado: ' + str(robot.getNombre()) + '(ChapinRescue)'
                     )
 

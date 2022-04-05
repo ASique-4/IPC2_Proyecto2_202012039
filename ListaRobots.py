@@ -44,3 +44,20 @@ class ListaRobot():
                 return n
             n = n.siguiente
         return False
+    
+    def eliminarRobot(self, nombre):
+        tmp = self.primero
+        while tmp is not None:
+            if tmp.nombre == nombre:
+                self.primero = tmp.siguiente
+                tmp.siguiente = None
+                print('Robot ',nombre, ' eliminado.')
+                break
+            elif tmp.siguiente is not None:
+                if tmp.siguiente.nombre == nombre:
+                    Nodo_a_borrar = tmp.siguiente
+                    tmp.siguiente = Nodo_a_borrar.siguiente
+                    Nodo_a_borrar.siguiente = None
+                    print('Robot ', nombre,' eliminado.')
+                    break
+            tmp = tmp.siguiente

@@ -127,6 +127,8 @@ def elementTree(ruta):
                 if subchild.tag == 'robot':
                     for subsubchild in subchild:
                         if subsubchild.tag == 'nombre':
+                            if lista_robots.search_item(subsubchild.text) != False:
+                                lista_matriz.eliminarCiudad(subsubchild.text)
                             if 'capacidad' in subsubchild.attrib:
                                 lista_robots.insertLastRobot(subsubchild.text,subsubchild.attrib['capacidad'],subsubchild.attrib['tipo'])
                             else:
