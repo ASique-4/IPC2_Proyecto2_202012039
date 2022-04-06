@@ -108,8 +108,6 @@ class MatrizDispersa():
             return '1' 
         else:
             return txt
-            
-
     
     def showNodoRecurso(self):
         self.setRecursos(0)
@@ -227,9 +225,6 @@ class MatrizDispersa():
                             break
                         else:
                             tmp2 = tmp2.abajo
-
-
-
 
     def graficarNeato(self, nombre,matriz):
         contenido = '''digraph G{
